@@ -1304,8 +1304,33 @@ footer {
   margin-bottom: 3rem;
 }
 
-.footer-brand .logo {
-  margin-bottom: 1rem;
+.footer-logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.footer-logo-img {
+  height: 36px;
+  width: auto;
+}
+
+.footer-logo-text {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text-primary);
+  font-size: 1.15rem;
+}
+
+.footer-logo-text span {
+  display: block;
+  font-size: 0.62rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
 }
 
 .footer-brand p {
