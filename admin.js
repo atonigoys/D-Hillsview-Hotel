@@ -49,12 +49,15 @@ function applyPermissions() {
         const userRole = document.querySelector('.user-role');
         const userAvatar = document.querySelector('.user-avatar');
 
-        if (userName) userName.textContent = 'Booking Staff';
-        if (userRole) userRole.textContent = 'Staff Access';
+        if (userName) userName.textContent = 'Staff Receptionist';
+        if (userRole) userRole.textContent = 'Booking Access';
         if (userAvatar) {
-            userAvatar.textContent = 'B';
+            userAvatar.textContent = 'R';
             userAvatar.style.background = 'var(--blue)';
         }
+
+        const topSub = document.getElementById('topbarSub');
+        if (topSub) topSub.textContent = 'Welcome back, Receptionist';
 
         // Hide Topbar Actions (Revenue-related or New Booking if restricted)
         // Let's keep +New Booking since it's Booking Staff
