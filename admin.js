@@ -196,7 +196,7 @@ function renderGuestsTable(bookings) {
             <td style="font-weight:600;">₱${g.totalSpent.toLocaleString()}</td>
             <td>${g.lastVisit}</td>
             <td>
-                <button class="topbar-btn" style="padding:0.4rem 0.6rem;" onclick="alert('View guest history for ${g.guest.replace(/'/g, "\\'")} coming soon')">👁️</button>
+                <button class="topbar-btn" style="padding:0.4rem 0.6rem;" onclick="showToast('View guest history for ${g.guest.replace(/'/g, "\\'")} coming soon', 'info')">👁️</button>
             </td>
         </tr>
     `).join('');
@@ -216,7 +216,7 @@ async function confirmBooking(ref) {
         .single();
 
     if (error) {
-        alert('Error confirming booking: ' + error.message);
+        showToast('Error confirming booking: ' + error.message, 'error');
         return;
     }
 
@@ -233,7 +233,7 @@ async function confirmBooking(ref) {
     });
 
     await refreshDashboard();
-    alert(`✅ Booking #${ref} confirmed and email sent!`);
+    showToast(`✅ Booking #${ref} confirmed and email sent!`);
 }
 
 function sendConfirmationEmail(data) {
@@ -265,7 +265,7 @@ async function cancelBooking(ref) {
         .eq('ref', ref);
 
     if (error) {
-        alert('Error cancelling booking: ' + error.message);
+        showToast('Error cancelling booking: ' + error.message, 'error');
         return;
     }
 
@@ -281,7 +281,7 @@ async function deleteBooking(ref) {
         .eq('ref', ref);
 
     if (error) {
-        alert('Error deleting booking: ' + error.message);
+        showToast('Error deleting booking: ' + error.message, 'error');
         return;
     }
 
@@ -368,7 +368,7 @@ async function updateInventory(type) {
     const newCount = parseInt(input.value, 10);
 
     if (isNaN(newCount) || newCount < 0) {
-        alert('Please enter a valid number of rooms.');
+        showToast('Please enter a valid number of rooms.', 'error');
         return;
     }
 
@@ -383,11 +383,11 @@ async function updateInventory(type) {
         .eq('id', 1);
 
     if (uErr) {
-        alert('Update failed: ' + uErr.message);
+        showToast('Update failed: ' + uErr.message, 'error');
         return;
     }
 
-    alert(`✅ ${type.toUpperCase()} Room inventory updated to ${newCount}`);
+    showToast(`✅ ${type.toUpperCase()} Room inventory updated to ${newCount}`);
     await renderRoomsGrid();
 }
 
@@ -414,7 +414,7 @@ async function savePricing() {
     const family = parsePrice('price-family');
 
     if (isNaN(single) || isNaN(deluxe) || isNaN(family)) {
-        alert('Please enter valid numeric prices.');
+        showToast('Please enter valid numeric prices.', 'error');
         return;
     }
 
@@ -428,15 +428,45 @@ async function savePricing() {
 
         if (error) {
             console.error('Supabase Save Error:', error);
-            alert('Save failed: ' + (error.message || 'Unknown error. Check console.'));
+            showToast('Save failed: ' + (error.message || 'Unknown error'), 'error');
             return;
         }
     } catch (err) {
         console.error('Network/Fetch Error:', err);
-        alert('Save failed: ' + err.message + '\n\nPossible causes:\n1. Supabase URL/Key is incorrect.\n2. Table "settings" doesn\'t exist (did you run the SQL?).\n3. CORS is blocking the request.');
+        showToast('Save failed: ' + err.message, 'error');
         return;
     }
 
-    alert('✅ Prices saved successfully! Changes will be reflected live on the website.');
+    showToast('✅ Prices saved successfully!');
     await refreshDashboard();
+}
+
+/**
+ * Custom Toast Notification System
+ * type: 'success' | 'error' | 'info'
+ */
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+
+    const icon = type === 'success' ? '✅' : (type === 'error' ? '❌' : 'ℹ️');
+
+    toast.innerHTML = `
+        <div class="toast-icon">${icon}</div>
+        <div class="toast-content">
+            <div class="toast-title">${type.toUpperCase()}</div>
+            <div class="toast-msg">${message}</div>
+        </div>
+    `;
+
+    container.appendChild(toast);
+
+    // Auto remove after 4s
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 400);
+    }, 4000);
 }
