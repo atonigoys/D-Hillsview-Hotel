@@ -41,7 +41,7 @@
 
     <script>
         if (sessionStorage.getItem('dhv_admin') === 'true') {
-            window.location.href = 'dashboard';
+            window.location.href = 'dashboard.html';
         }
 
         const CREDENTIALS = {
@@ -55,12 +55,12 @@
             const pass = document.getElementById('password').value;
             const err = document.getElementById('loginError');
 
-            const creds = CREDENTIALS[user];
+            const creds = CREDENTIALS[user.toLowerCase()];
 
             if (creds && creds.pass === pass) {
                 sessionStorage.setItem('dhv_admin', 'true');
                 sessionStorage.setItem('dhv_role', creds.role);
-                window.location.href = 'dashboard';
+                window.location.href = 'dashboard.html';
             } else {
                 err.classList.add('show');
                 document.getElementById('username').classList.add('error');
