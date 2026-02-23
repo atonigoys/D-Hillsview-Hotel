@@ -316,11 +316,12 @@ section {
   }
 }
 
-.hero h1 {
-  font-size: clamp(2.8rem, 6vw, 5rem);
-  font-weight: 700;
-  margin-bottom: 1.25rem;
-  line-height: 1.1;
+.hero-main-logo {
+  max-width: 500px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
 }
 
 .hero h1 em {
