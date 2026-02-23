@@ -1,8 +1,14 @@
+// VERSION: 1.0.2 (Supabase Migration Fix)
 /* ============================================================
    Hotel Luxe — admin.js
    Handles: auth check, tab switching, sidebar toggle, stats,
             booking filters, pricing persistence, and table rendering.
    ============================================================ */
+
+console.log('🔄 Admin script loading... (v1.0.2)');
+if (!window.supabaseClient) {
+    console.warn('⚠️ Supabase client not found on load. Checking window...');
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     // 0. AUTH CHECK
