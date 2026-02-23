@@ -421,7 +421,7 @@ async function handleBookingSubmit() {
 
     const isAvailable = await checkRoomAvailability(roomName, ci, co);
     if (!isAvailable) {
-        alert(`Sorry, the ${roomName} is fully booked for those dates. Please try different dates or another room type.`);
+        openAlertModal(`The ${roomName} is fully booked from ${ci} to ${co}. Please try another date or room type.`);
         if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Confirm Booking →';
@@ -487,6 +487,20 @@ async function handleBookingSubmit() {
 function closeModal() {
     document.getElementById('confirmModal').classList.remove('active');
     window.location.href = 'index.html';
+}
+
+function openAlertModal(message) {
+    const modal = document.getElementById('alertModal');
+    const msgEl = document.getElementById('alertMessage');
+    if (modal && msgEl) {
+        msgEl.textContent = message;
+        modal.classList.add('active');
+    }
+}
+
+function closeAlertModal() {
+    const modal = document.getElementById('alertModal');
+    if (modal) modal.classList.remove('active');
 }
 
 // ----------------------------------------------------------

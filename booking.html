@@ -264,12 +264,11 @@
 
     <!-- AVAILABILITY ALERT MODAL -->
     <div class="modal-overlay" id="alertModal">
-        <div class="modal" style="max-width: 400px; text-align: center;">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">🗓️</div>
-            <h2 style="color: var(--gold); margin-bottom: 1rem;">Fully Booked</h2>
-            <p id="alertMessage" style="margin-bottom: 2rem; color: var(--text-muted); line-height: 1.6;"></p>
-            <button class="btn-primary" onclick="closeAlertModal()" style="width: 100%; justify-content: center;">Try
-                Other Dates</button>
+        <div class="modal-card">
+            <div class="modal-icon">🗓️</div>
+            <h2 id="alertTitle">Fully Booked</h2>
+            <p id="alertMessage"></p>
+            <button class="btn-modal" onclick="closeAlertModal()">Try Other Dates</button>
         </div>
     </div>
     <script src="script.js"></script>
