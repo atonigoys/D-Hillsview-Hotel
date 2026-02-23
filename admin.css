@@ -215,6 +215,35 @@ img {
     border-color: var(--red);
 }
 
+.password-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrap input {
+    width: 100%;
+    padding-right: 3rem;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.password-toggle:hover {
+    color: var(--gold);
+}
+
 .login-error {
     background: rgba(224, 90, 90, 0.12);
     border: 1px solid rgba(224, 90, 90, 0.25);
