@@ -248,6 +248,33 @@ img {
     box-shadow: 0 10px 28px rgba(201, 169, 110, 0.4);
 }
 
+/* Logo Branding */
+.logo-branding {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1;
+}
+
+.logo-branding .logo-main {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--text-primary);
+}
+
+.logo-branding .logo-sub {
+    font-size: 0.35em;
+    text-transform: uppercase;
+    letter-spacing: 0.38em;
+    color: var(--gold);
+    margin-top: 0.2rem;
+    text-align: justify;
+    text-align-last: justify;
+    width: 100%;
+    font-weight: 600;
+}
+
 .login-hint {
     text-align: center;
     font-size: 0.78rem;
