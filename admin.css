@@ -1726,6 +1726,21 @@ img {
     color: var(--green);
 }
 
+/* Drag and Drop */
+.tc-booking-bar[draggable="true"] {
+    cursor: grab;
+}
+
+.tc-booking-bar[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+.tc-room-cell.drag-over {
+    background: rgba(212, 168, 71, 0.15) !important;
+    outline: 1px dashed var(--gold);
+    outline-offset: -1px;
+}
+
 /* Responsive adjustments for rates page */
 @media (max-width: 1024px) {
     .rates-stats-row {

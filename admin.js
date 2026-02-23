@@ -847,6 +847,9 @@ async function renderRatePlans() {
 // ----------------------------------------------------------
 const TAPE_DAYS = 14;
 
+// Track manual room assignments: { bookingId: roomSlotNumber }
+const roomAssignments = {};
+
 async function renderAvailMatrix(startDate) {
     const chart = document.getElementById('tapeChart');
     const rangeLabel = document.getElementById('matrixDateRange');
@@ -896,7 +899,6 @@ async function renderAvailMatrix(startDate) {
     }
 
     // Columns: 1 label + TAPE_DAYS dates
-    const cols = TAPE_DAYS + 1;
     chart.style.gridTemplateColumns = `140px repeat(${TAPE_DAYS}, 70px)`;
 
     let html = '';
@@ -931,37 +933,39 @@ async function renderAvailMatrix(startDate) {
         // Get bookings for this room type
         const typeBookings = bookings.filter(b => b.room.toLowerCase().includes(rt.id));
 
+        // Smart room assignment: respect manual assignments, then fill gaps
+        function getSlotForBooking(booking, slotNum) {
+            // If manually assigned, use that
+            if (roomAssignments[booking.id] !== undefined) {
+                return roomAssignments[booking.id] === slotNum;
+            }
+            // Default round-robin
+            const idx = typeBookings.indexOf(booking);
+            return (idx % inv) === (slotNum - 1);
+        }
+
         // ── INDIVIDUAL ROOM ROWS ──
         for (let r = 1; r <= inv; r++) {
             const roomNum = rt.prefix * 100 + r;
             html += `<div class="tc-room-row">`;
             html += `<div class="tc-room-label">Room ${roomNum}</div>`;
 
-            // Assign bookings to this room slot
-            // Simple assignment: distribute bookings round-robin across room slots
-            const roomSlotBookings = typeBookings.filter((b, idx) => {
-                // Assign each booking to a slot based on index
-                return (idx % inv) === (r - 1);
-            });
+            const roomSlotBookings = typeBookings.filter(b => getSlotForBooking(b, r));
 
             dates.forEach((d, colIdx) => {
                 const ds = fmtDate(d);
                 const isToday = ds === todayStr;
-                html += `<div class="tc-room-cell${isToday ? ' tc-today' : ''}">`;
+                html += `<div class="tc-room-cell${isToday ? ' tc-today' : ''}" data-room="${roomNum}" data-room-type="${rt.id}" data-slot="${r}" data-date="${ds}">`;
 
-                // Check if any booking spans this date for this room slot
                 roomSlotBookings.forEach(b => {
                     if (b.checkin <= ds && b.checkout > ds) {
-                        // Only render bar on the start date (or first visible date)
                         const barStart = b.checkin < fmtDate(dates[0]) ? fmtDate(dates[0]) : b.checkin;
                         if (ds === barStart) {
-                            // Calculate bar width in columns
                             const endDate = b.checkout > fmtDate(dates[TAPE_DAYS - 1]) ? fmtDate(dates[TAPE_DAYS - 1]) : b.checkout;
                             const startD = new Date(barStart + 'T00:00:00');
                             const endD = new Date(endDate + 'T00:00:00');
                             const spanDays = Math.max(1, Math.round((endD - startD) / 86400000));
 
-                            // Width = spanDays * 70px - 2px gap
                             const widthPx = spanDays * 70 - 2;
 
                             const statusClass = b.status === 'confirmed' ? 'status-confirmed'
@@ -970,7 +974,7 @@ async function renderAvailMatrix(startDate) {
                                         : 'status-cancelled';
 
                             const guestName = b.guest || b.email?.split('@')[0] || 'Guest';
-                            html += `<div class="tc-booking-bar ${statusClass}" style="width:${widthPx}px;" title="${guestName} — ${b.checkin} to ${b.checkout} (${b.status})">${guestName}</div>`;
+                            html += `<div class="tc-booking-bar ${statusClass}" draggable="true" data-booking-id="${b.id}" data-room-type="${rt.id}" style="width:${widthPx}px;" title="${guestName} — ${b.checkin} to ${b.checkout} (${b.status})">${guestName}</div>`;
                         }
                     }
                 });
@@ -996,6 +1000,75 @@ async function renderAvailMatrix(startDate) {
     });
 
     chart.innerHTML = html;
+
+    // ── ATTACH DRAG-AND-DROP LISTENERS ──
+    attachTapeChartDragDrop(chart);
+}
+
+// ── DRAG-AND-DROP ENGINE ──
+function attachTapeChartDragDrop(chart) {
+    let draggedBar = null;
+    let dragBookingId = null;
+    let dragRoomType = null;
+
+    // Booking bars: dragstart
+    chart.querySelectorAll('.tc-booking-bar').forEach(bar => {
+        bar.addEventListener('dragstart', (e) => {
+            draggedBar = bar;
+            dragBookingId = bar.dataset.bookingId;
+            dragRoomType = bar.dataset.roomType;
+            bar.style.opacity = '0.4';
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', dragBookingId);
+        });
+
+        bar.addEventListener('dragend', () => {
+            bar.style.opacity = '1';
+            // Remove all drop highlights
+            chart.querySelectorAll('.tc-room-cell.drag-over').forEach(c => c.classList.remove('drag-over'));
+            draggedBar = null;
+            dragBookingId = null;
+            dragRoomType = null;
+        });
+    });
+
+    // Room cells: dragover & drop
+    chart.querySelectorAll('.tc-room-cell').forEach(cell => {
+        cell.addEventListener('dragover', (e) => {
+            // Only allow drop on same room type
+            if (cell.dataset.roomType === dragRoomType) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                // Highlight the entire row
+                const targetSlot = cell.dataset.slot;
+                chart.querySelectorAll('.tc-room-cell.drag-over').forEach(c => c.classList.remove('drag-over'));
+                chart.querySelectorAll(`.tc-room-cell[data-slot="${targetSlot}"][data-room-type="${dragRoomType}"]`).forEach(c => c.classList.add('drag-over'));
+            }
+        });
+
+        cell.addEventListener('dragleave', () => {
+            cell.classList.remove('drag-over');
+        });
+
+        cell.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const targetSlot = parseInt(cell.dataset.slot);
+            const targetRoomType = cell.dataset.roomType;
+
+            if (targetRoomType === dragRoomType && dragBookingId) {
+                // Update room assignment
+                roomAssignments[dragBookingId] = targetSlot;
+
+                // Remove highlights
+                chart.querySelectorAll('.tc-room-cell.drag-over').forEach(c => c.classList.remove('drag-over'));
+
+                // Re-render the chart with new assignments
+                renderAvailMatrix(matrixStartDate);
+
+                showToast(`Guest moved to Room ${cell.dataset.room}`, 'success');
+            }
+        });
+    });
 }
 
 function navigateMatrix(days) {
