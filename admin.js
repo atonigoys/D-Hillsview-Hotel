@@ -597,9 +597,6 @@ async function savePricing() {
 // ----------------------------------------------------------
 let matrixStartDate = new Date();
 matrixStartDate.setHours(0, 0, 0, 0);
-// Snap to Monday
-const dayOfWeek = matrixStartDate.getDay();
-matrixStartDate.setDate(matrixStartDate.getDate() - ((dayOfWeek + 6) % 7));
 
 function renderRatesPage() {
     renderBaseRates();
@@ -846,12 +843,14 @@ async function renderRatePlans() {
 }
 
 // ----------------------------------------------------------
-// AVAILABILITY MATRIX
+// AVAILABILITY MATRIX — TAPE CHART
 // ----------------------------------------------------------
+const TAPE_DAYS = 14;
+
 async function renderAvailMatrix(startDate) {
-    const table = document.getElementById('availMatrix');
+    const chart = document.getElementById('tapeChart');
     const rangeLabel = document.getElementById('matrixDateRange');
-    if (!table) return;
+    if (!chart) return;
 
     // Fetch bookings and settings
     const [bookingsRes, settingsRes] = await Promise.all([
@@ -859,18 +858,21 @@ async function renderAvailMatrix(startDate) {
         window.supabaseClient.from('settings').select('*').eq('id', 1).single()
     ]);
 
-    const bookings = bookingsRes.data || [];
-    const config = settingsRes.data || { inventory: { single: 10, deluxe: 10, family: 10 } };
+    const bookings = (bookingsRes.data || []).filter(b => b.status !== 'cancelled');
+    const config = settingsRes.data || {
+        inventory: { single: 10, deluxe: 10, family: 10 },
+        prices: { single: 180, deluxe: 320, family: 420 }
+    };
 
-    const rooms = [
-        { id: 'single', name: 'Single Room' },
-        { id: 'deluxe', name: 'Deluxe Room' },
-        { id: 'family', name: 'Family Room' }
+    const roomTypes = [
+        { id: 'single', name: 'Single Room', prefix: 1 },
+        { id: 'deluxe', name: 'Deluxe Room', prefix: 2 },
+        { id: 'family', name: 'Family Room', prefix: 3 }
     ];
 
-    // Generate 7 dates
+    // Generate dates
     const dates = [];
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < TAPE_DAYS; i++) {
         const d = new Date(startDate);
         d.setDate(d.getDate() + i);
         dates.push(d);
@@ -879,124 +881,131 @@ async function renderAvailMatrix(startDate) {
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+    // Today string (local)
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
     // Update label
     const startLabel = `${monthNames[dates[0].getMonth()]} ${dates[0].getDate()}`;
-    const endLabel = `${monthNames[dates[6].getMonth()]} ${dates[6].getDate()}, ${dates[6].getFullYear()}`;
+    const endLabel = `${monthNames[dates[TAPE_DAYS - 1].getMonth()]} ${dates[TAPE_DAYS - 1].getDate()}, ${dates[TAPE_DAYS - 1].getFullYear()}`;
     if (rangeLabel) rangeLabel.textContent = `${startLabel} — ${endLabel}`;
 
-    // Count bookings per room per date
-    function countBookingsForDate(roomType, date) {
-        const dateStr = date.toISOString().split('T')[0];
-        return bookings.filter(b => {
-            const r = b.room.toLowerCase();
-            if (!r.includes(roomType)) return false;
-            if (b.status === 'cancelled') return false;
-            return b.checkin <= dateStr && b.checkout > dateStr;
-        }).length;
+    // Helper: format date to YYYY-MM-DD (local)
+    function fmtDate(d) {
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
-    // Build table
-    let html = '<thead><tr><th>Room Type</th>';
+    // Columns: 1 label + TAPE_DAYS dates
+    const cols = TAPE_DAYS + 1;
+    chart.style.gridTemplateColumns = `140px repeat(${TAPE_DAYS}, 70px)`;
+
+    let html = '';
+
+    // ── DATE HEADER ROW ──
+    html += `<div class="tc-date-row">`;
+    html += `<div class="tc-corner"></div>`;
     dates.forEach(d => {
-        const isToday = d.toDateString() === new Date().toDateString();
-        html += `<th style="${isToday ? 'color:var(--gold);' : ''}">${dayNames[d.getDay()]}<br>${d.getDate()} ${monthNames[d.getMonth()]}</th>`;
+        const ds = fmtDate(d);
+        const isToday = ds === todayStr;
+        html += `<div class="tc-date-cell${isToday ? ' tc-today' : ''}">
+            <span class="tc-day-name">${dayNames[d.getDay()]}</span>
+            <span class="tc-day-num">${d.getDate()} ${monthNames[d.getMonth()]}</span>
+        </div>`;
     });
-    html += '</tr></thead><tbody>';
+    html += `</div>`;
 
-    // Room rows
-    const summaryAvail = new Array(7).fill(0);
-    rooms.forEach(room => {
-        html += `<tr><td>${room.name}</td>`;
-        dates.forEach((d, i) => {
-            const bookedCount = countBookingsForDate(room.id, d);
-            const totalInv = config.inventory[room.id] || 10;
-            const available = Math.max(totalInv - bookedCount, 0);
-            summaryAvail[i] += available;
+    // For each room type
+    roomTypes.forEach(rt => {
+        const inv = config.inventory[rt.id] || 10;
+        const price = config.prices[rt.id] || 0;
 
-            let status = 'available';
-            if (available === 0) status = 'booked';
-            else if (available <= Math.ceil(totalInv * 0.3)) status = 'low';
-
-            const dateStr = d.toISOString().split('T')[0];
-            html += `<td><div class="avail-cell ${status}" onclick="showDateAvailability('${dateStr}')" title="${available}/${totalInv} available">${available}</div></td>`;
+        // ── GROUP HEADER ──
+        html += `<div class="tc-group-row">`;
+        html += `<div class="tc-group-label">▸ ${rt.name} <span class="tc-group-price">₱${price.toLocaleString()} / night</span></div>`;
+        dates.forEach(d => {
+            const isToday = fmtDate(d) === todayStr;
+            html += `<div class="tc-group-day${isToday ? ' tc-today' : ''}"></div>`;
         });
-        html += '</tr>';
+        html += `</div>`;
+
+        // Get bookings for this room type
+        const typeBookings = bookings.filter(b => b.room.toLowerCase().includes(rt.id));
+
+        // ── INDIVIDUAL ROOM ROWS ──
+        for (let r = 1; r <= inv; r++) {
+            const roomNum = rt.prefix * 100 + r;
+            html += `<div class="tc-room-row">`;
+            html += `<div class="tc-room-label">Room ${roomNum}</div>`;
+
+            // Assign bookings to this room slot
+            // Simple assignment: distribute bookings round-robin across room slots
+            const roomSlotBookings = typeBookings.filter((b, idx) => {
+                // Assign each booking to a slot based on index
+                return (idx % inv) === (r - 1);
+            });
+
+            dates.forEach((d, colIdx) => {
+                const ds = fmtDate(d);
+                const isToday = ds === todayStr;
+                html += `<div class="tc-room-cell${isToday ? ' tc-today' : ''}">`;
+
+                // Check if any booking spans this date for this room slot
+                roomSlotBookings.forEach(b => {
+                    if (b.checkin <= ds && b.checkout > ds) {
+                        // Only render bar on the start date (or first visible date)
+                        const barStart = b.checkin < fmtDate(dates[0]) ? fmtDate(dates[0]) : b.checkin;
+                        if (ds === barStart) {
+                            // Calculate bar width in columns
+                            const endDate = b.checkout > fmtDate(dates[TAPE_DAYS - 1]) ? fmtDate(dates[TAPE_DAYS - 1]) : b.checkout;
+                            const startD = new Date(barStart + 'T00:00:00');
+                            const endD = new Date(endDate + 'T00:00:00');
+                            const spanDays = Math.max(1, Math.round((endD - startD) / 86400000));
+
+                            // Width = spanDays * 70px - 2px gap
+                            const widthPx = spanDays * 70 - 2;
+
+                            const statusClass = b.status === 'confirmed' ? 'status-confirmed'
+                                : b.status === 'pending' ? 'status-pending'
+                                    : b.status === 'checked-in' ? 'status-checked-in'
+                                        : 'status-cancelled';
+
+                            const guestName = b.guest || b.email?.split('@')[0] || 'Guest';
+                            html += `<div class="tc-booking-bar ${statusClass}" style="width:${widthPx}px;" title="${guestName} — ${b.checkin} to ${b.checkout} (${b.status})">${guestName}</div>`;
+                        }
+                    }
+                });
+
+                html += `</div>`;
+            });
+
+            html += `</div>`;
+        }
+
+        // ── OCCUPANCY ROW ──
+        html += `<div class="tc-occ-row">`;
+        html += `<div class="tc-occ-label">Occupancy</div>`;
+        dates.forEach(d => {
+            const ds = fmtDate(d);
+            const isToday = ds === todayStr;
+            const bookedCount = typeBookings.filter(b => b.checkin <= ds && b.checkout > ds).length;
+            const pct = inv > 0 ? Math.round((bookedCount / inv) * 100) : 0;
+            const occClass = pct >= 80 ? 'occ-high' : pct >= 40 ? 'occ-med' : 'occ-low';
+            html += `<div class="tc-occ-cell${isToday ? ' tc-today' : ''} ${occClass}">${pct}%</div>`;
+        });
+        html += `</div>`;
     });
 
-    // Summary row
-    html += '<tr class="summary-row"><td>Total Available</td>';
-    summaryAvail.forEach(val => {
-        html += `<td>${val}</td>`;
-    });
-    html += '</tr></tbody>';
-
-    table.innerHTML = html;
+    chart.innerHTML = html;
 }
 
 function navigateMatrix(days) {
     if (days === 0) {
         matrixStartDate = new Date();
         matrixStartDate.setHours(0, 0, 0, 0);
-        const dow = matrixStartDate.getDay();
-        matrixStartDate.setDate(matrixStartDate.getDate() - ((dow + 6) % 7));
     } else {
         matrixStartDate.setDate(matrixStartDate.getDate() + days);
     }
     renderAvailMatrix(matrixStartDate);
-}
-
-async function showDateAvailability(dateStr) {
-    const panel = document.getElementById('availDetailPanel');
-    const title = document.getElementById('availDetailTitle');
-    const body = document.getElementById('availDetailBody');
-    if (!panel || !title || !body) return;
-
-    const d = new Date(dateStr + 'T00:00:00');
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    title.textContent = `📅 ${monthNames[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-
-    const [bookingsRes, settingsRes] = await Promise.all([
-        window.supabaseClient.from('bookings').select('*'),
-        window.supabaseClient.from('settings').select('*').eq('id', 1).single()
-    ]);
-
-    const bookings = bookingsRes.data || [];
-    const config = settingsRes.data || { inventory: { single: 10, deluxe: 10, family: 10 }, prices: { single: 180, deluxe: 320, family: 420 } };
-
-    const rooms = [
-        { id: 'single', name: 'Single Room' },
-        { id: 'deluxe', name: 'Deluxe Room' },
-        { id: 'family', name: 'Family Room' }
-    ];
-
-    body.innerHTML = rooms.map(room => {
-        const bookedCount = bookings.filter(b => {
-            const r = b.room.toLowerCase();
-            if (!r.includes(room.id)) return false;
-            if (b.status === 'cancelled') return false;
-            return b.checkin <= dateStr && b.checkout > dateStr;
-        }).length;
-
-        const totalInv = config.inventory[room.id] || 10;
-        const available = Math.max(totalInv - bookedCount, 0);
-        let status = 'confirmed';
-        if (available === 0) status = 'cancelled';
-        else if (available <= Math.ceil(totalInv * 0.3)) status = 'pending';
-
-        return `
-            <div class="avail-detail-room">
-                <div>
-                    <div style="font-weight:600;">${room.name}</div>
-                    <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">₱${config.prices[room.id]} / night</div>
-                </div>
-                <div style="text-align:right;">
-                    <span class="badge ${status}">${available}/${totalInv} avail.</span>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    panel.classList.remove('hidden');
 }
 
 /**
