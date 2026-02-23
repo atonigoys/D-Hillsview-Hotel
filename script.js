@@ -461,7 +461,7 @@ async function handleBookingSubmit() {
 
     // Save to Supabase
     const booking = {
-        ref, guest: guestName, guest_name: guestName, email, phone,
+        ref, guest: guestName, email, phone,
         room: roomName, checkin: ci2, checkout: co2,
         nights, amount: total, status: 'pending'
     };
