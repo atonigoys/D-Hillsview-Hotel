@@ -142,14 +142,25 @@ section {
 }
 
 .logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
 }
 
-.logo span {
-  color: var(--gold);
+.nav-logo {
+  height: 60px;
+  width: auto;
+  transition: var(--transition);
+}
+
+.scrolled .nav-logo {
+  height: 50px;
+}
+
+.sidebar-logo-img {
+  width: 100%;
+  max-width: 140px;
+  height: auto;
+  margin-bottom: 0.5rem;
 }
 
 .nav-links {
