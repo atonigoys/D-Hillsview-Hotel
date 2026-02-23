@@ -118,6 +118,82 @@ async function refreshDashboard() {
     if (pendingBadge) {
         pendingBadge.textContent = pendingCount;
     }
+
+    // 5. Render Charts
+    renderCharts(bookings);
+}
+
+// ----------------------------------------------------------
+// CHART RENDERING
+// ----------------------------------------------------------
+function renderCharts(bookings) {
+    // A. REVENUE CHART (Last 7 Months)
+    const revenueEl = document.getElementById('revenueChart');
+    if (revenueEl) {
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const now = new Date();
+        const last7 = [];
+
+        // Prep 7 month slots
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            last7.push({
+                label: monthNames[d.getMonth()],
+                month: d.getMonth(),
+                year: d.getFullYear(),
+                val: 0
+            });
+        }
+
+        // Sum up revenue
+        bookings.forEach(b => {
+            const bDate = new Date(b.created_at);
+            const match = last7.find(m => m.month === bDate.getMonth() && m.year === bDate.getFullYear());
+            if (match) match.val += (parseFloat(b.amount) || 0);
+        });
+
+        const maxVal = Math.max(...last7.map(m => m.val), 1000); // at least 1000 scale
+
+        revenueEl.innerHTML = last7.map(m => {
+            const height = (m.val / maxVal) * 100;
+            return `
+                <div class="bar-group">
+                    <div class="bar-val">${m.val > 0 ? '₱' + Math.round(m.val / 1000) + 'k' : ''}</div>
+                    <div class="bar" style="height: ${Math.max(height, 5)}%;" title="₱${m.val.toLocaleString()}"></div>
+                    <div class="bar-label">${m.label}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // B. DONUT CHART (Room Distribution)
+    const donutPct = document.querySelector('.donut-center .pct');
+    if (donutPct) {
+        const counts = { single: 0, deluxe: 0, family: 0 };
+        bookings.forEach(b => {
+            const r = b.room.toLowerCase();
+            if (r.includes('single')) counts.single++;
+            else if (r.includes('deluxe')) counts.deluxe++;
+            else if (r.includes('family')) counts.family++;
+        });
+
+        const total = bookings.length || 1; // avoid div by 0
+        const sPct = Math.round((counts.single / total) * 100);
+        const dPct = Math.round((counts.deluxe / total) * 100);
+        const fPct = Math.round((counts.family / total) * 100);
+
+        donutPct.textContent = bookings.length;
+
+        // Update Legend
+        const legendVals = document.querySelectorAll('.legend-val');
+        if (legendVals.length >= 3) {
+            legendVals[0].textContent = sPct + '%';
+            legendVals[1].textContent = dPct + '%';
+            legendVals[2].textContent = fPct + '%';
+        }
+
+        // Update SVG (Simple dash-array trick if we wanted, but let's stick to text for now)
+    }
 }
 
 // ----------------------------------------------------------
