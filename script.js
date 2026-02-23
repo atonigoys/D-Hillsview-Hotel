@@ -15,6 +15,30 @@ document.addEventListener('DOMContentLoaded', () => {
         return data || { prices: { single: 180, deluxe: 320, family: 420 } };
     }
 
+    // Helper: get best active discount for a room type
+    function getBestDiscount(roomType) {
+        let plans = [];
+        try { plans = JSON.parse(localStorage.getItem('dhv_rate_plans') || '[]'); } catch { }
+        const today = new Date().toISOString().split('T')[0];
+
+        let bestDiscount = 0;
+        let bestPlanName = '';
+        plans.forEach(p => {
+            if (!p.active) return;
+            // Check room applicability
+            if (p.rooms !== 'all' && p.rooms !== roomType) return;
+            // Check date validity
+            if (p.validFrom && today < p.validFrom) return;
+            if (p.validUntil && today > p.validUntil) return;
+            // Keep best discount
+            if (p.discount > bestDiscount) {
+                bestDiscount = p.discount;
+                bestPlanName = p.name;
+            }
+        });
+        return { discount: bestDiscount, planName: bestPlanName };
+    }
+
     async function applyDynamicPricing() {
         const config = await getPricing();
 
@@ -23,18 +47,65 @@ document.addEventListener('DOMContentLoaded', () => {
             const name = card.querySelector('.room-name')?.textContent.toLowerCase();
             const amountEl = card.querySelector('.amount');
             const bookBtn = card.querySelector('.btn-book');
+            const priceWrap = card.querySelector('.room-price');
 
             let price = 0;
-            if (name?.includes('single')) price = config.prices.single;
-            else if (name?.includes('deluxe')) price = config.prices.deluxe;
-            else if (name?.includes('family')) price = config.prices.family;
+            let roomKey = '';
+            if (name?.includes('single')) { price = config.prices.single; roomKey = 'single'; }
+            else if (name?.includes('deluxe')) { price = config.prices.deluxe; roomKey = 'deluxe'; }
+            else if (name?.includes('family')) { price = config.prices.family; roomKey = 'family'; }
 
             if (price > 0) {
-                if (amountEl) amountEl.textContent = `₱${price}`;
-                if (bookBtn) {
-                    const url = new URL(bookBtn.href, window.location.origin);
-                    url.searchParams.set('price', price);
-                    bookBtn.href = url.pathname + url.search;
+                const { discount, planName } = getBestDiscount(roomKey);
+
+                // Remove any previous promo elements
+                card.querySelector('.promo-badge')?.remove();
+                card.querySelector('.original-price')?.remove();
+                card.querySelector('.promo-label')?.remove();
+
+                if (discount > 0) {
+                    // Calculate discounted price
+                    const promoPrice = Math.round(price * (1 - discount / 100));
+
+                    // Show crossed-out original + promo price
+                    if (amountEl) amountEl.textContent = `₱${promoPrice.toLocaleString()}`;
+
+                    // Insert original price (crossed out) before the amount
+                    if (priceWrap && !priceWrap.querySelector('.original-price')) {
+                        const origEl = document.createElement('div');
+                        origEl.className = 'original-price';
+                        origEl.textContent = `₱${price.toLocaleString()}`;
+                        priceWrap.insertBefore(origEl, priceWrap.firstChild);
+
+                        const labelEl = document.createElement('div');
+                        labelEl.className = 'promo-label';
+                        labelEl.textContent = `${discount}% OFF`;
+                        priceWrap.appendChild(labelEl);
+                    }
+
+                    // Add promo badge to image
+                    const imgWrap = card.querySelector('.room-img');
+                    if (imgWrap && !imgWrap.querySelector('.promo-badge')) {
+                        const badge = document.createElement('span');
+                        badge.className = 'room-badge promo-badge';
+                        badge.textContent = `🔥 ${planName}`;
+                        imgWrap.appendChild(badge);
+                    }
+
+                    // Update booking link with promo price
+                    if (bookBtn) {
+                        const url = new URL(bookBtn.href, window.location.origin);
+                        url.searchParams.set('price', promoPrice);
+                        bookBtn.href = url.pathname + url.search;
+                    }
+                } else {
+                    // No promo — show normal price
+                    if (amountEl) amountEl.textContent = `₱${price.toLocaleString()}`;
+                    if (bookBtn) {
+                        const url = new URL(bookBtn.href, window.location.origin);
+                        url.searchParams.set('price', price);
+                        bookBtn.href = url.pathname + url.search;
+                    }
                 }
             }
         });
@@ -44,9 +115,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (roomSel) {
             [...roomSel.options].forEach(opt => {
                 const val = opt.value.toLowerCase();
-                if (val.includes('single')) opt.dataset.price = config.prices.single;
-                else if (val.includes('deluxe')) opt.dataset.price = config.prices.deluxe;
-                else if (val.includes('family')) opt.dataset.price = config.prices.family;
+                let basePrice = 0;
+                let roomKey = '';
+                if (val.includes('single')) { basePrice = config.prices.single; roomKey = 'single'; }
+                else if (val.includes('deluxe')) { basePrice = config.prices.deluxe; roomKey = 'deluxe'; }
+                else if (val.includes('family')) { basePrice = config.prices.family; roomKey = 'family'; }
+
+                if (basePrice > 0) {
+                    const { discount } = getBestDiscount(roomKey);
+                    const finalPrice = discount > 0 ? Math.round(basePrice * (1 - discount / 100)) : basePrice;
+                    opt.dataset.price = finalPrice;
+                }
             });
             updatePriceSummary();
         }
