@@ -1006,7 +1006,7 @@ async function renderAvailMatrix(startDate) {
     chart.innerHTML = html;
 
     // ── ATTACH DRAG-AND-DROP LISTENERS ──
-    attachTapeChartDragDrop(chart);
+    attachTapeChartDragDrop(chart, bookings);
 
     // ── ATTACH ROOM STATUS CLICK HANDLERS ──
     chart.querySelectorAll('.tc-room-status').forEach(icon => {
@@ -1015,7 +1015,7 @@ async function renderAvailMatrix(startDate) {
 }
 
 // ── DRAG-AND-DROP ENGINE ──
-function attachTapeChartDragDrop(chart) {
+function attachTapeChartDragDrop(chart, allBookings) {
     let draggedBar = null;
     let dragBookingId = null;
     let dragRoomType = null;
@@ -1059,22 +1059,61 @@ function attachTapeChartDragDrop(chart) {
             cell.classList.remove('drag-over');
         });
 
-        cell.addEventListener('drop', (e) => {
+        cell.addEventListener('drop', async (e) => {
             e.preventDefault();
             const targetSlot = parseInt(cell.dataset.slot);
             const targetRoomType = cell.dataset.roomType;
+            const targetDate = cell.dataset.date;
 
             if (targetRoomType === dragRoomType && dragBookingId) {
-                // Update room assignment
+                // Find original booking
+                const booking = allBookings.find(b => b.id.toString() === dragBookingId);
+                if (!booking) return;
+
+                // Calculate duration
+                const start = new Date(booking.checkin + 'T00:00:00');
+                const end = new Date(booking.checkout + 'T00:00:00');
+                const durationDays = Math.round((end - start) / 86400000);
+
+                // Calculate new dates
+                const newStart = new Date(targetDate + 'T00:00:00');
+                const newEnd = new Date(newStart);
+                newEnd.setDate(newEnd.getDate() + durationDays);
+
+                function fmtDate(d) {
+                    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                }
+
+                const newCheckin = fmtDate(newStart);
+                const newCheckout = fmtDate(newEnd);
+
+                // Update assignment map (for visuals)
                 roomAssignments[dragBookingId] = targetSlot;
+
+                // Sync to Supabase
+                showToast('Moving booking...', 'info');
+
+                const { error } = await window.supabaseClient
+                    .from('bookings')
+                    .update({
+                        checkin: newCheckin,
+                        checkout: newCheckout,
+                        room: `${booking.room.split(' ')[0]} ${cell.dataset.room}` // e.g. "single 102"
+                    })
+                    .eq('id', dragBookingId);
+
+                if (error) {
+                    console.error('Error moving booking:', error);
+                    showToast('Failed to move booking dates', 'error');
+                } else {
+                    showToast(`Moved to Room ${cell.dataset.room} (${newCheckin})`, 'success');
+                }
 
                 // Remove highlights
                 chart.querySelectorAll('.tc-room-cell.drag-over').forEach(c => c.classList.remove('drag-over'));
 
-                // Re-render the chart with new assignments
+                // Re-render
                 renderAvailMatrix(matrixStartDate);
-
-                showToast(`Guest moved to Room ${cell.dataset.room}`, 'success');
             }
         });
     });
