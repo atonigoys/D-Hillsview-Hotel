@@ -13,7 +13,7 @@ if (!window.supabaseClient) {
 document.addEventListener('DOMContentLoaded', () => {
     // 0. AUTH CHECK
     if (sessionStorage.getItem('dhv_admin') !== 'true') {
-        window.location.href = 'admin.html';
+        window.location.href = 'admin';
         return;
     }
 
@@ -58,7 +58,7 @@ function toggleSidebar() {
 // ----------------------------------------------------------
 function signOut() {
     sessionStorage.removeItem('dhv_admin');
-    window.location.href = 'admin.html';
+    window.location.href = 'admin';
 }
 
 // ----------------------------------------------------------

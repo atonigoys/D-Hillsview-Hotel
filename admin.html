@@ -36,7 +36,7 @@
     <script>
         // Redirect if already logged in
         if (sessionStorage.getItem('dhv_admin') === 'true') {
-            window.location.href = 'dashboard.html';
+            window.location.href = 'dashboard';
         }
 
         function handleLogin(e) {
@@ -47,7 +47,7 @@
 
             if (user === 'admin' && pass === 'admin123') {
                 sessionStorage.setItem('dhv_admin', 'true');
-                window.location.href = 'dashboard.html';
+                window.location.href = 'dashboard';
             } else {
                 err.classList.add('show');
                 document.getElementById('username').classList.add('error');
