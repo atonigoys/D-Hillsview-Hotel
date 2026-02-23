@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Your Stay — D'HILLSVIEW HOTEL</title>
+    <meta name="description"
+        content="Reserve your luxury room or suite at Hotel Luxe. Simple, secure booking with instant confirmation." />
+    <link rel="stylesheet" href="styles.css" />
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+        emailjs.init({ publicKey: 'uZmUYIHG86UEqYztE' });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar scrolled" id="navbar">
+        <div class="container nav-inner">
+            <a class="logo" href="index.html">D'HILLSVIEW <span>HOTEL</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="rooms.html">Rooms</a></li>
+                <li><a href="index.html#features">Amenities</a></li>
+                <li><a href="index.html#testimonials">Reviews</a></li>
+            </ul>
+            <a href="booking.html" class="btn nav-btn active">Book Now</a>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- BOOKING PAGE -->
+    <main class="booking-page">
+        <div class="container">
+            <div class="section-label" style="margin-bottom:0.5rem;">Make a Reservation</div>
+            <h1
+                style="font-family:'Playfair Display',serif; font-size: clamp(2rem,4vw,2.75rem); margin-bottom: 2.5rem;">
+                Book Your Perfect Stay</h1>
+
+            <div class="booking-layout">
+
+                <!-- LEFT: FORM -->
+                <div>
+
+                    <!-- Step 1: Stay Details -->
+                    <div class="form-section" style="margin-bottom:1.5rem;">
+                        <div class="form-title">🗓️ Stay Details</div>
+
+                        <div class="form-row">
+                            <div class="form-group" id="fg-checkin">
+                                <label for="b-checkin">Check-In Date</label>
+                                <input type="date" id="b-checkin" name="checkin" />
+                                <span class="error-msg">Please select a check-in date.</span>
+                            </div>
+                            <div class="form-group" id="fg-checkout">
+                                <label for="b-checkout">Check-Out Date</label>
+                                <input type="date" id="b-checkout" name="checkout" />
+                                <span class="error-msg">Check-out must be after check-in.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group" id="fg-room">
+                                <label for="b-room">Room Type</label>
+                                <select id="b-room" name="room">
+                                    <option value="">Select a Room</option>
+                                    <option value="Single Room" data-price="180"
+                                        data-img="https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=400&q=70">
+                                        Single Room — ₱180/night</option>
+                                    <option value="Deluxe Room" data-price="320"
+                                        data-img="https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=400&q=70">
+                                        Deluxe Room — ₱320/night</option>
+                                    <option value="Family Room" data-price="420"
+                                        data-img="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=70">
+                                        Family Room — ₱420/night</option>
+                                </select>
+                                <span class="error-msg">Please select a room type.</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="b-guests">Number of Guests</label>
+                                <select id="b-guests" name="guests">
+                                    <option value="1">1 Guest</option>
+                                    <option value="2" selected>2 Guests</option>
+                                    <option value="3">3 Guests</option>
+                                    <option value="4">4 Guests</option>
+                                    <option value="5">5+ Guests</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="b-addons">Special Add-Ons</label>
+                            <select id="b-addons" name="addons">
+                                <option value="none">No Add-Ons</option>
+                                <option value="breakfast" data-cost="40">🍳 Breakfast for 2 — +₱40/day</option>
+                                <option value="spa" data-cost="120">🧖 Couples Spa Session — +₱120</option>
+                                <option value="transfer" data-cost="80">🚐 Airport Transfer — +₱80</option>
+                                <option value="romance" data-cost="200">🌹 Romance Package — +₱200</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Guest Info -->
+                    <div class="form-section" style="margin-bottom:1.5rem;">
+                        <div class="form-title">👤 Guest Information</div>
+
+                        <div class="form-row">
+                            <div class="form-group" id="fg-firstname">
+                                <label for="b-firstname">First Name</label>
+                                <input type="text" id="b-firstname" name="firstname" placeholder="John" />
+                                <span class="error-msg">First name is required.</span>
+                            </div>
+                            <div class="form-group" id="fg-lastname">
+                                <label for="b-lastname">Last Name</label>
+                                <input type="text" id="b-lastname" name="lastname" placeholder="Doe" />
+                                <span class="error-msg">Last name is required.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group" id="fg-email">
+                                <label for="b-email">Email Address</label>
+                                <input type="email" id="b-email" name="email" placeholder="john@example.com" />
+                                <span class="error-msg">Please enter a valid email address.</span>
+                            </div>
+                            <div class="form-group" id="fg-phone">
+                                <label for="b-phone">Phone Number</label>
+                                <input type="tel" id="b-phone" name="phone" placeholder="+1 (555) 000-0000" />
+                                <span class="error-msg">Phone number is required.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="b-requests">Special Requests (Optional)</label>
+                            <textarea id="b-requests" name="requests"
+                                placeholder="e.g., Late check-in, high floor preference, dietary requirements..."></textarea>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <!-- RIGHT: PRICE SUMMARY -->
+                <div>
+                    <div class="price-panel">
+                        <h3>📋 Booking Summary</h3>
+
+                        <div class="price-room-preview" id="roomPreview" style="display:none;">
+                            <img id="roomPreviewImg" src="" alt="Selected room" />
+                        </div>
+
+                        <div id="summaryRoomName"
+                            style="font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:600; margin-bottom:1rem; color:var(--text-muted);">
+                            Select a room to see summary</div>
+
+                        <div class="price-row" id="priceNight" style="display:none;">
+                            <span class="label" id="pricePerNightLabel">Room rate</span>
+                            <span class="value" id="pricePerNightVal">—</span>
+                        </div>
+                        <div class="price-row" id="priceNights" style="display:none;">
+                            <span class="label" id="nightsLabel">Nights</span>
+                            <span class="value" id="nightsVal">—</span>
+                        </div>
+                        <div class="price-row" id="priceAddon" style="display:none;">
+                            <span class="label" id="addonLabel">Add-On</span>
+                            <span class="value" id="addonVal">—</span>
+                        </div>
+
+                        <hr class="price-divider" id="priceDivider" style="display:none;" />
+
+                        <div class="price-row total" id="priceTotal" style="display:none;">
+                            <span class="label">Total</span>
+                            <span class="value" id="totalVal">—</span>
+                        </div>
+
+                        <button class="btn-confirm" id="btnConfirm" onclick="handleBookingSubmit()">
+                            Confirm Booking →
+                        </button>
+
+                        <p style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:1rem;">Free
+                            cancellation up to 48 hours before check-in</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- GCASH PAYMENT MODAL -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal" style="max-width: 450px;">
+            <div
+                style="background:var(--blue); color:white; padding:1.5rem; border-radius: var(--radius) var(--radius) 0 0; margin: -2rem -2rem 1.5rem -2rem; display:flex; align-items:center; justify-content:center; gap:0.75rem;">
+                <span style="font-size:1.5rem;">📱</span>
+                <span style="font-weight:700; font-size:1.1rem; letter-spacing:0.05em;">GCASH QR PAYMENT</span>
+            </div>
+
+            <h2 id="modalTitle">Booking Submitted!</h2>
+            <p style="margin-bottom:1.5rem; font-size:0.95rem;">To finalize your reservation, please scan the QR code
+                below and pay the total amount via <strong style="color:var(--blue);">GCash</strong>.</p>
+
+            <!-- GCash QR Placeholder -->
+            <div
+                style="background:white; padding:1.5rem; border-radius:12px; margin: 0 auto 1.5rem; width:fit-content; border: 2px solid var(--blue);">
+                <div
+                    style="width:200px; height:200px; background:#f0f4f8; border:1px dashed #cbd5e0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#4a5568;">
+                    <span style="font-size:2rem; margin-bottom:0.5rem;">🔳</span>
+                    <span
+                        style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em;">Scan
+                        to Pay</span>
+                    <div style="margin-top:1rem; font-weight:700; color:var(--blue);">D'HILLSVIEW HOTEL</div>
+                </div>
+            </div>
+
+            <div
+                style="background:rgba(255,255,255,0.03); padding:1rem; border-radius:8px; border:1px solid var(--border-light); margin-bottom:1.5rem; text-align:left;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem; font-size:0.85rem;">
+                    <span style="color:var(--text-muted);">Account Name:</span>
+                    <strong style="color:var(--blue);">D'HILLSVIEW HOTEL</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                    <span style="color:var(--text-muted);">Booking Ref:</span>
+                    <strong style="color:var(--gold);" id="bookingRef">#DHV-XXXXXX</strong>
+                </div>
+            </div>
+
+            <p id="bookingSummaryText" style="font-size:0.82rem; color:var(--text-muted); margin-bottom:2rem;"></p>
+
+            <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+                <button class="btn-primary" onclick="sendToFB()"
+                    style="background:#1877F2; border-color:#1877F2; color: #ffffff !important; font-weight: 700; width: 100%; justify-content: center; box-shadow: 0 4px 12px rgba(24, 119, 242, 0.4); text-transform: uppercase; font-size: 0.9rem;">
+                    SEND RECEIPT TO FB PAGE
+                </button>
+            </div>
+
+            <p style="font-size:0.7rem; color:var(--text-muted); margin-top:1.25rem;">Our staff will verify your payment
+                and confirm your booking within 24 hours.</p>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer style="margin-top:80px;">
+        <div class="container">
+            <div class="footer-bottom">
+                <span>&copy; 2026 D'HILLSVIEW HOTEL. All Rights Reserved.</span>
+                <a href="admin-login.html"
+                    style="font-size:0.75rem;color:var(--text-muted);text-decoration:none;margin-left:auto;opacity:0.6;transition:opacity 0.2s;"
+                    onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">🔐 Admin</a>
+                <div class="social-links">
+                    <div class="social-link">📸</div>
+                    <div class="social-link">📘</div>
+                    <div class="social-link">🐦</div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- AVAILABILITY ALERT MODAL -->
+    <div class="modal-overlay" id="alertModal">
+        <div class="modal" style="max-width: 400px; text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🗓️</div>
+            <h2 style="color: var(--gold); margin-bottom: 1rem;">Fully Booked</h2>
+            <p id="alertMessage" style="margin-bottom: 2rem; color: var(--text-muted); line-height: 1.6;"></p>
+            <button class="btn-primary" onclick="closeAlertModal()" style="width: 100%; justify-content: center;">Try
+                Other Dates</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

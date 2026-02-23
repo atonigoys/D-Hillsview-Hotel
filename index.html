@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>D'HILLSVIEW HOTEL — A World of Luxury Awaits</title>
+    <meta name="description"
+        content="Hotel Luxe offers unparalleled luxury accommodations. Book your perfect stay with world-class amenities, stunning views, and exceptional service." />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-inner">
+            <a class="logo" href="index.html">D'HILLSVIEW <span>HOTEL</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="rooms.html">Rooms</a></li>
+                <li><a href="#policies">Policies</a></li>
+                <li><a href="#location">Location</a></li>
+
+            </ul>
+            <a href="booking.html" class="btn nav-btn">Book Now</a>
+            <div class="hamburger" id="hamburger" aria-label="Menu" role="button">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg"
+            style="background-image: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1920&q=80');">
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">5-Star Luxury Experience</div>
+                <h1>Experience <em>Luxury</em><br>Like Never Before</h1>
+                <p>Discover a sanctuary of refined elegance. From ocean-view suites to world-class dining, every detail
+                    is crafted for your comfort.</p>
+                <div class="hero-actions">
+                    <a href="rooms.html" class="btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                        </svg>
+                        Explore Rooms
+                    </a>
+                    <a href="booking.html" class="btn-outline">Book Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BOOKING BAR -->
+    <div class="booking-bar-wrap">
+        <div class="booking-bar">
+            <div class="booking-field">
+                <label for="checkin">Check-In</label>
+                <input type="date" id="checkin" name="checkin" />
+            </div>
+            <div class="booking-field">
+                <label for="checkout">Check-Out</label>
+                <input type="date" id="checkout" name="checkout" />
+            </div>
+            <div class="booking-field">
+                <label for="guests">Guests</label>
+                <select id="guests" name="guests">
+                    <option value="1">1 Guest</option>
+                    <option value="2" selected>2 Guests</option>
+                    <option value="3">3 Guests</option>
+                    <option value="4">4 Guests</option>
+                    <option value="5">5+ Guests</option>
+                </select>
+            </div>
+            <div class="booking-field">
+                <label for="room-type">Room Type</label>
+                <select id="room-type" name="room-type">
+                    <option value="">Any Type</option>
+                    <option value="single">Single Room</option>
+                    <option value="deluxe">Deluxe Room</option>
+                    <option value="family">Family Room</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="handleHeroSearch()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                </svg>
+                Search
+            </button>
+        </div>
+    </div>
+
+    <!-- STATS STRIP -->
+    <div class="stats-strip">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item reveal">
+                    <div class="number" data-count="350">0</div>
+                    <div class="label">Luxury Rooms</div>
+                </div>
+                <div class="stat-item reveal">
+                    <div class="number" data-count="18">0</div>
+                    <div class="label">Fine Dining Venues</div>
+                </div>
+                <div class="stat-item reveal">
+                    <div class="number" data-count="98">0</div>
+                    <div class="label">% Guest Satisfaction</div>
+                </div>
+                <div class="stat-item reveal">
+                    <div class="number" data-count="25">0</div>
+                    <div class="label">Years of Excellence</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEATURED ROOMS -->
+    <section>
+        <div class="container">
+            <div class="section-label reveal">Our Accommodations</div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 3rem;">
+                <h2 class="section-title reveal">Curated Rooms &amp; Suites</h2>
+                <a href="rooms.html" class="btn-outline reveal" style="flex-shrink:0;">View All Rooms</a>
+            </div>
+            <div class="rooms-grid">
+
+                <div class="room-card reveal" data-room="single">
+                    <div class="room-img">
+                        <img src="https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=600&q=75"
+                            alt="Single Room" loading="lazy" />
+                    </div>
+                    <div class="room-body">
+                        <div class="room-name">Single Room</div>
+                        <p class="room-desc">A cozy and elegantly appointed room for solo travellers, featuring a queen
+                            bed and all modern conveniences.</p>
+                        <div class="amenities">
+                            <span class="amenity">🛏️ Queen Bed</span>
+                            <span class="amenity">📺 Smart TV</span>
+                            <span class="amenity">☕ Mini Bar</span>
+                            <span class="amenity">🌿 City View</span>
+                        </div>
+                        <div class="room-footer">
+                            <div class="room-price">
+                                <div class="amount">₱180</div>
+                                <div class="per">per night</div>
+                            </div>
+                            <a href="booking.html?room=Single+Room&price=180" class="btn-book">Book Now</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="room-card reveal" data-room="deluxe">
+                    <div class="room-img">
+                        <img src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=600&q=75"
+                            alt="Deluxe Room" loading="lazy" />
+                        <span class="room-badge popular">Popular</span>
+                    </div>
+                    <div class="room-body">
+                        <div class="room-name">Deluxe Room</div>
+                        <p class="room-desc">Spacious and refined with a king bed, ocean-view balcony, rainfall shower,
+                            and premium in-room amenities.</p>
+                        <div class="amenities">
+                            <span class="amenity">🛏️ King Bed</span>
+                            <span class="amenity">🌊 Ocean View</span>
+                            <span class="amenity">🍃 Balcony</span>
+                            <span class="amenity">🍳 Breakfast</span>
+                        </div>
+                        <div class="room-footer">
+                            <div class="room-price">
+                                <div class="amount">₱320</div>
+                                <div class="per">per night</div>
+                            </div>
+                            <a href="booking.html?room=Deluxe+Room&price=320" class="btn-book">Book Now</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="room-card reveal" data-room="family">
+                    <div class="room-img">
+                        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=75"
+                            alt="Family Room" loading="lazy" />
+                        <span class="room-badge featured">Best Value</span>
+                    </div>
+                    <div class="room-body">
+                        <div class="room-name">Family Room</div>
+                        <p class="room-desc">A generous room with two queen beds, a living area, and family-friendly
+                            amenities — perfect for a memorable trip together.</p>
+                        <div class="amenities">
+                            <span class="amenity">🛏️ Twin Queen Beds</span>
+                            <span class="amenity">🛁 Bathtub</span>
+                            <span class="amenity">🍽️ Dining Area</span>
+                            <span class="amenity">🏋️ Gym Access</span>
+                        </div>
+                        <div class="room-footer">
+                            <div class="room-price">
+                                <div class="amount">₱420</div>
+                                <div class="per">per night</div>
+                            </div>
+                            <a href="booking.html?room=Family+Room&price=420" class="btn-book">Book Now</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- HOTEL POLICIES -->
+    <section class="policies-section" id="policies">
+        <div class="container">
+            <div class="section-label reveal">Guest Information</div>
+            <h2 class="section-title reveal">Hotel Policies</h2>
+            <p class="section-subtitle reveal" style="margin-bottom:3rem;">Please review our policies to ensure a
+                seamless and comfortable stay.</p>
+            <div class="policies-grid">
+                <div class="policy-card reveal">
+                    <div class="policy-icon">🕐</div>
+                    <h3>Check-In / Check-Out</h3>
+                    <p>Check-in from <strong>2:00 PM</strong>. Check-out by <strong>12:00 PM</strong>. Early check-in
+                        and late check-out available upon request, subject to availability.</p>
+                </div>
+                <div class="policy-card reveal">
+                    <div class="policy-icon">📋</div>
+                    <h3>Cancellation Policy</h3>
+                    <p>Free cancellation up to <strong>48 hours</strong> before check-in. Cancellations within 48 hours
+                        will be charged one night's stay.</p>
+                </div>
+                <div class="policy-card reveal">
+                    <div class="policy-icon">🐾</div>
+                    <h3>Pet Policy</h3>
+                    <p>We welcome small pets (under 10kg) with a <strong>₱25/night</strong> surcharge. Please notify us
+                        during booking. Service animals are always welcome.</p>
+                </div>
+                <div class="policy-card reveal">
+                    <div class="policy-icon">🚭</div>
+                    <h3>Smoking Policy</h3>
+                    <p>All indoor areas are <strong>non-smoking</strong>. Designated smoking areas are available on the
+                        ground floor terrace.</p>
+                </div>
+                <div class="policy-card reveal">
+                    <div class="policy-icon">💳</div>
+                    <h3>Payment Methods</h3>
+                    <p>We accept <strong>Visa, Mastercard, GCash, Maya,</strong> and cash. A valid ID is required upon
+                        check-in for all guests.</p>
+                </div>
+                <div class="policy-card reveal">
+                    <div class="policy-icon">👶</div>
+                    <h3>Children &amp; Extra Beds</h3>
+                    <p>Children under 6 stay <strong>free</strong> using existing bedding. Extra beds available for
+                        <strong>₱20/night</strong> upon request.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LOCATION -->
+    <section class="location-section" id="location">
+        <div class="container">
+            <div class="section-label reveal">Find Us</div>
+            <h2 class="section-title reveal">Our Location</h2>
+            <p class="section-subtitle reveal" style="margin-bottom:3rem;">Conveniently situated in the heart of the
+                city, just minutes away from major attractions.</p>
+            <div class="location-content">
+                <div class="location-map reveal">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3861.802548!2d121.04549!3d14.55368!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTTCsDMzJzEzLjIiTiAxMjHCsDAyJzQzLjgiRQ!5e0!3m2!1sen!2sph!4v1"
+                        width="100%" height="400" style="border:0; border-radius: var(--radius);" allowfullscreen=""
+                        loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+                <div class="location-details reveal">
+                    <div class="location-info-card">
+                        <div class="location-info-item">
+                            <div class="info-icon">📍</div>
+                            <div>
+                                <h4>Address</h4>
+                                <p>1 Grand Promenade, Marina Bay, Metro Manila, Philippines</p>
+                            </div>
+                        </div>
+                        <div class="location-info-item">
+                            <div class="info-icon">📞</div>
+                            <div>
+                                <h4>Phone</h4>
+                                <p>+63 (2) 8888-LUXE</p>
+                            </div>
+                        </div>
+                        <div class="location-info-item">
+                            <div class="info-icon">✉️</div>
+                            <div>
+                                <h4>Email</h4>
+                                <p>stay@dhillsviewhotel.com</p>
+                            </div>
+                        </div>
+                        <div class="location-info-item">
+                            <div class="info-icon">🕐</div>
+                            <div>
+                                <h4>Front Desk Hours</h4>
+                                <p>Open 24 hours, 7 days a week</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA BANNER -->
+    <section style="padding: 80px 0;">
+        <div class="container">
+            <div style="background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(201,169,110,0.05)); border: 1px solid var(--border); border-radius: var(--radius); padding: 4rem; text-align: center; position: relative; overflow: hidden;"
+                class="reveal">
+                <div
+                    style="position:absolute; top:-60px; right:-60px; width:240px; height:240px; background: radial-gradient(circle, rgba(201,169,110,0.15), transparent 70%); pointer-events:none;">
+                </div>
+                <div class="section-label" style="justify-content:center; display:flex;">Limited Offer</div>
+                <h2 style="font-size: clamp(2rem, 4vw, 2.75rem); margin-bottom: 1rem;">15% Off Your First Stay</h2>
+                <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 2rem;">Book directly through our
+                    website and receive an exclusive discount plus complimentary breakfast for two.</p>
+                <a href="booking.html" class="btn-primary" style="font-size:1rem; padding: 1rem 2.5rem;">
+                    Claim Your Offer →
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="logo">D'HILLSVIEW <span>HOTEL</span></div>
+                    <p>A sanctuary of refined elegance. Where world-class luxury meets the warmth of exceptional
+                        personal service.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="rooms.html">Rooms &amp; Suites</a></li>
+                        <li><a href="#policies">Policies</a></li>
+                        <li><a href="#location">Location</a></li>
+                        <li><a href="booking.html">Make a Reservation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Hotel</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Dining</a></li>
+                        <li><a href="#">Spa &amp; Wellness</a></li>
+                        <li><a href="#">Events</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col footer-contact">
+                    <h4>Contact</h4>
+                    <p>📍 1 Grand Promenade, Marina Bay</p>
+                    <p>📞 +1 (800) 555-LUXE</p>
+                    <p>✉️ stay@hotelluxe.com</p>
+                    <p>🕐 Check-in: 3PM | Out: 12PM</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 D'HILLSVIEW HOTEL. All Rights Reserved.</span>
+                <a href="admin-login.html"
+                    style="font-size:0.75rem;color:var(--text-muted);text-decoration:none;margin-left:auto;opacity:0.6;transition:opacity 0.2s;"
+                    onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">🔐 Admin</a>
+                <div class="social-links">
+                    <div class="social-link" title="Instagram">📸</div>
+                    <div class="social-link" title="Facebook">📘</div>
+                    <div class="social-link" title="Twitter">🐦</div>
+                    <div class="social-link" title="YouTube">▶️</div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

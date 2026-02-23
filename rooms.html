@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rooms &amp; Suites — D'HILLSVIEW HOTEL</title>
+    <meta name="description"
+        content="Browse our curated selection of luxury rooms, deluxe suites, and presidential accommodations at Hotel Luxe." />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar scrolled" id="navbar">
+        <div class="container nav-inner">
+            <a class="logo" href="index.html">D'HILLSVIEW <span>HOTEL</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="rooms.html" class="active">Rooms</a></li>
+                <li><a href="index.html#policies">Policies</a></li>
+                <li><a href="index.html#location">Location</a></li>
+
+            </ul>
+            <a href="booking.html" class="btn nav-btn">Book Now</a>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div class="container">
+            <div class="section-label" style="justify-content:center; display:flex;">Our Accommodations</div>
+            <h1 class="section-title">Rooms &amp; Suites</h1>
+            <p class="section-subtitle" style="margin: 0 auto; text-align:center;">From cozy classic rooms to opulent
+                penthouses — find your perfect retreat.</p>
+        </div>
+    </div>
+
+    <!-- ROOMS LISTING -->
+    <section style="padding-top: 60px;">
+        <div class="container">
+
+            <!-- Filters -->
+            <div class="filter-tabs" id="filterTabs">
+                <button class="filter-tab active" data-filter="all">All Rooms</button>
+                <button class="filter-tab" data-filter="single">Single Room</button>
+                <button class="filter-tab" data-filter="deluxe">Deluxe Room</button>
+                <button class="filter-tab" data-filter="family">Family Room</button>
+            </div>
+
+            <!-- Grid -->
+            <div class="rooms-grid" id="roomsGrid">
+
+
+                <div class="room-card reveal" data-category="single">
+                    <div class="room-img">
+                        <img src="https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=600&q=75"
+                            alt="Single Room" loading="lazy" />
+                    </div>
+                    <div class="room-body">
+                        <div class="room-name">Single Room</div>
+                        <p class="room-desc">A cozy and elegantly appointed room for solo travellers, featuring a queen
+                            bed and all modern conveniences.</p>
+                        <div class="amenities">
+                            <span class="amenity">🛏️ Queen Bed</span>
+                            <span class="amenity">📺 Smart TV</span>
+                            <span class="amenity">☕ Mini Bar</span>
+                            <span class="amenity">🌿 City View</span>
+                        </div>
+                        <div class="room-footer">
+                            <div class="room-price">
+                                <div class="amount">₱180</div>
+                                <div class="per">per night</div>
+                            </div>
+                            <a href="booking.html?room=Single+Room&price=180" class="btn-book">Book Now</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="room-card reveal" data-category="deluxe">
+                    <div class="room-img">
+                        <img src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=600&q=75"
+                            alt="Deluxe Room" loading="lazy" />
+                        <span class="room-badge popular">Popular</span>
+                    </div>
+                    <div class="room-body">
+                        <div class="room-name">Deluxe Room</div>
+                        <p class="room-desc">Spacious and refined, with a king bed, ocean-view balcony, rainfall shower,
+                            and premium in-room amenities.</p>
+                        <div class="amenities">
+                            <span class="amenity">🛏️ King Bed</span>
+                            <span class="amenity">🌊 Ocean View</span>
+                            <span class="amenity">🍃 Balcony</span>
+                            <span class="amenity">🍳 Breakfast</span>
+                        </div>
+                        <div class="room-footer">
+                            <div class="room-price">
+                                <div class="amount">₱320</div>
+                                <div class="per">per night</div>
+                            </div>
+                            <a href="booking.html?room=Deluxe+Room&price=320" class="btn-book">Book Now</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="room-card reveal" data-category="family">
+                    <div class="room-img">
+                        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=75"
+                            alt="Family Room" loading="lazy" />
+                        <span class="room-badge featured">Best Value</span>
+                    </div>
+                    <div class="room-body">
+                        <div class="room-name">Family Room</div>
+                        <p class="room-desc">A generous suite with two queen beds, a living area, and family-friendly
+                            amenities — perfect for a memorable trip together.</p>
+                        <div class="amenities">
+                            <span class="amenity">🛏️ Twin Queen Beds</span>
+                            <span class="amenity">🛁 Bathtub</span>
+                            <span class="amenity">🍽️ Dining Area</span>
+                            <span class="amenity">🏋️ Gym Access</span>
+                        </div>
+                        <div class="room-footer">
+                            <div class="room-price">
+                                <div class="amount">₱420</div>
+                                <div class="per">per night</div>
+                            </div>
+                            <a href="booking.html?room=Family+Room&price=420" class="btn-book">Book Now</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="logo">D'HILLSVIEW <span>HOTEL</span></div>
+                    <p>A sanctuary of refined elegance. Where world-class luxury meets the warmth of exceptional
+                        personal service.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="rooms.html">Rooms &amp; Suites</a></li>
+                        <li><a href="index.html#policies">Policies</a></li>
+                        <li><a href="index.html#location">Location</a></li>
+                        <li><a href="booking.html">Make a Reservation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Hotel</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Dining</a></li>
+                        <li><a href="#">Spa &amp; Wellness</a></li>
+                        <li><a href="#">Events</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col footer-contact">
+                    <h4>Contact</h4>
+                    <p>📍 1 Grand Promenade, Marina Bay</p>
+                    <p>📞 +1 (800) 555-LUXE</p>
+                    <p>✉️ stay@hotelluxe.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 D'HILLSVIEW HOTEL. All Rights Reserved.</span>
+                <a href="admin-login.html"
+                    style="font-size:0.75rem;color:var(--text-muted);text-decoration:none;margin-left:auto;opacity:0.6;transition:opacity 0.2s;"
+                    onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">🔐 Admin</a>
+                <div class="social-links">
+                    <div class="social-link">📸</div>
+                    <div class="social-link">📘</div>
+                    <div class="social-link">🐦</div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — D'HILLSVIEW HOTEL Admin</title>
+    <link rel="stylesheet" href="admin.css" />
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+        emailjs.init({ publicKey: 'uZmUYIHG86UEqYztE' });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-text">D'HILLSVIEW <span>HOTEL</span></div>
+                <div class="logo-sub">Admin Dashboard</div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Main</div>
+                <div class="nav-item active" data-page="overview" onclick="switchPage(this, 'overview')">
+                    <span class="nav-icon">📊</span> Overview
+                </div>
+                <div class="nav-item" data-page="bookings" onclick="switchPage(this, 'bookings')">
+                    <span class="nav-icon">📅</span> Bookings
+                    <span class="nav-badge" id="pendingBadge">3</span>
+                </div>
+                <div class="nav-item" data-page="rooms" onclick="switchPage(this, 'rooms')">
+                    <span class="nav-icon">🛏️</span> Rooms
+                </div>
+                <div class="nav-item" data-page="guests" onclick="switchPage(this, 'guests')">
+                    <span class="nav-icon">👥</span> Guests
+                </div>
+
+                <div class="nav-section-label">System</div>
+                <div class="nav-item" onclick="window.open('index.html','_blank')">
+                    <span class="nav-icon">🌐</span> View Website
+                </div>
+                <div class="nav-item" data-page="settings" onclick="switchPage(this, 'settings')">
+                    <span class="nav-icon">⚙️</span> Settings
+                </div>
+            </nav>
+
+            <div class="sidebar-user">
+                <div class="user-avatar">A</div>
+                <div>
+                    <div class="user-name">Administrator</div>
+                    <div class="user-role">Super Admin</div>
+                </div>
+                <button class="btn-signout" title="Sign Out" onclick="signOut()">🚪</button>
+            </div>
+        </aside>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <div class="main-content">
+
+            <!-- Topbar -->
+            <div class="topbar">
+                <div style="display:flex; align-items:center; gap:0.85rem;">
+                    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+                    <div>
+                        <div class="topbar-title" id="topbarTitle">Overview</div>
+                        <div class="topbar-sub" id="topbarSub">Welcome back, Administrator</div>
+                    </div>
+                </div>
+                <div class="topbar-actions">
+                    <button class="topbar-btn notif-dot" onclick="alert('No new notifications')">🔔
+                        Notifications</button>
+                    <button class="topbar-btn primary"
+                        onclick="switchPage(document.querySelector('[data-page=bookings]'), 'bookings')">+ New
+                        Booking</button>
+                </div>
+            </div>
+
+            <!-- ===== PAGE: OVERVIEW ===== -->
+            <div class="dashboard-page" id="page-overview">
+
+                <!-- Stat Cards -->
+                <div class="stats-row">
+                    <div class="stat-card" style="--card-color: var(--gold)">
+                        <div class="stat-header">
+                            <div class="stat-label">Total Revenue</div>
+                            <div class="stat-icon">💰</div>
+                        </div>
+                        <div class="stat-value" id="stat-revenue">₱0</div>
+                        <div class="stat-change" id="stat-change-revenue">No data yet</div>
+                    </div>
+                    <div class="stat-card" style="--card-color: var(--blue)">
+                        <div class="stat-header">
+                            <div class="stat-label">Total Bookings</div>
+                            <div class="stat-icon">📅</div>
+                        </div>
+                        <div class="stat-value" id="stat-bookings">0</div>
+                        <div class="stat-change" id="stat-change-bookings">No data yet</div>
+                    </div>
+                    <div class="stat-card" style="--card-color: var(--green)">
+                        <div class="stat-header">
+                            <div class="stat-label">Occupancy Rate</div>
+                            <div class="stat-icon">🏨</div>
+                        </div>
+                        <div class="stat-value" id="stat-occupancy">0%</div>
+                        <div class="stat-change" id="stat-change-occupancy">No data yet</div>
+                    </div>
+                    <div class="stat-card" style="--card-color: var(--purple)">
+                        <div class="stat-header">
+                            <div class="stat-label">New Guests</div>
+                            <div class="stat-icon">👥</div>
+                        </div>
+                        <div class="stat-value" id="stat-guests">0</div>
+                        <div class="stat-change" id="stat-change-guests">No data yet</div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-row">
+                    <!-- Bar chart: Monthly Revenue -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div>
+                                <div class="chart-title">Monthly Revenue</div>
+                                <div class="chart-sub">Last 7 months</div>
+                            </div>
+                            <div style="font-size:0.78rem; color:var(--text-muted);">2026</div>
+                        </div>
+                        <div class="bar-chart" id="revenueChart"></div>
+                    </div>
+
+                    <!-- Donut chart: Room type distribution -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div>
+                                <div class="chart-title">Bookings by Room</div>
+                                <div class="chart-sub">This month</div>
+                            </div>
+                        </div>
+                        <div class="donut-wrap">
+                            <div class="donut">
+                                <svg width="140" height="140" viewBox="0 0 140 140">
+                                    <circle cx="70" cy="70" r="54" fill="none" stroke="rgba(255,255,255,0.05)"
+                                        stroke-width="18" />
+                                </svg>
+                                <div class="donut-center">
+                                    <span class="pct">0</span>
+                                    <span class="lbl">Booked</span>
+                                </div>
+                            </div>
+                            <div class="donut-legend">
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background:var(--gold)"></div>
+                                    <span class="legend-label">Single Room</span>
+                                    <span class="legend-val">0%</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background:var(--blue)"></div>
+                                    <span class="legend-label">Deluxe Room</span>
+                                    <span class="legend-val">0%</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background:var(--purple)"></div>
+                                    <span class="legend-label">Family Room</span>
+                                    <span class="legend-val">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Bookings table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <div>
+                            <div class="table-title">Recent Bookings</div>
+                            <div class="table-count">Showing 5 of 142 bookings</div>
+                        </div>
+                        <div style="display:flex;gap:0.65rem;align-items:center;">
+                            <div class="table-search">
+                                <span>🔍</span>
+                                <input type="text" placeholder="Search bookings..."
+                                    oninput="filterTable(this.value, 'bookingsTable')" />
+                            </div>
+                            <button class="topbar-btn"
+                                onclick="switchPage(document.querySelector('[data-page=bookings]'), 'bookings')">View
+                                All</button>
+                        </div>
+                    </div>
+                    <table class="data-table" id="bookingsTable">
+                        <thead>
+                            <tr>
+                                <th>Ref #</th>
+                                <th>Guest</th>
+                                <th>Room</th>
+                                <th>Check-In</th>
+                                <th>Check-Out</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="overviewBookingBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== PAGE: BOOKINGS ===== -->
+            <div class="dashboard-page hidden" id="page-bookings">
+                <div class="table-card">
+                    <div class="table-header">
+                        <div>
+                            <div class="table-title">All Bookings</div>
+                            <div class="table-count" id="bookingCount">142 total</div>
+                        </div>
+                        <div style="display:flex;gap:0.65rem;align-items:center;flex-wrap:wrap;">
+                            <select id="statusFilter" onchange="applyFilters()"
+                                style="background:rgba(255,255,255,0.04);border:1px solid var(--border-light);border-radius:6px;padding:0.45rem 0.8rem;color:var(--text-primary);font-family:'Inter',sans-serif;font-size:0.82rem;outline:none;">
+                                <option value="all">All Status</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="pending">Pending</option>
+                                <option value="checkedin">Checked-In</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                            <div class="table-search">
+                                <span>🔍</span>
+                                <input type="text" id="bookingSearch" placeholder="Search..."
+                                    oninput="applyFilters()" />
+                            </div>
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Ref #</th>
+                                <th>Guest</th>
+                                <th>Room</th>
+                                <th>Check-In</th>
+                                <th>Check-Out</th>
+                                <th>Nights</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allBookingBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== PAGE: ROOMS ===== -->
+            <div class="dashboard-page hidden" id="page-rooms">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+                    <div>
+                        <h2 style="font-family:'Playfair Display',serif;font-size:1.25rem;">Room Management</h2>
+                        <p style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">Toggle room availability in
+                            real-time</p>
+                    </div>
+                </div>
+                <div class="admin-rooms-grid" id="adminRoomsGrid"></div>
+            </div>
+
+            <!-- ===== PAGE: GUESTS ===== -->
+            <div class="dashboard-page hidden" id="page-guests">
+                <div class="table-card">
+                    <div class="table-header">
+                        <div>
+                            <div class="table-title">Guest Directory</div>
+                            <div class="table-count" id="guestDirCount">0 registered guests</div>
+                        </div>
+                        <div class="table-search">
+                            <span>🔍</span>
+                            <input type="text" placeholder="Search guests..."
+                                oninput="filterTable(this.value, 'guestsTable')" />
+                        </div>
+                    </div>
+                    <table class="data-table" id="guestsTable">
+                        <thead>
+                            <tr>
+                                <th>Guest</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Total Stays</th>
+                                <th>Total Spent</th>
+                                <th>Last Visit</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="guestsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== PAGE: REVENUE ===== -->
+            <div class="dashboard-page hidden" id="page-revenue">
+                <div class="stats-row" style="margin-bottom:2rem;">
+                    <div class="stat-card" style="--card-color:var(--gold)">
+                        <div class="stat-header">
+                            <div class="stat-label">This Month</div>
+                            <div class="stat-icon">📅</div>
+                        </div>
+                        <div class="stat-value">₱0</div>
+                        <div class="stat-change">No data yet</div>
+                    </div>
+                    <div class="stat-card" style="--card-color:var(--green)">
+                        <div class="stat-header">
+                            <div class="stat-label">YTD Revenue</div>
+                            <div class="stat-icon">📈</div>
+                        </div>
+                        <div class="stat-value">₱0</div>
+                        <div class="stat-change">No data yet</div>
+                    </div>
+                    <div class="stat-card" style="--card-color:var(--blue)">
+                        <div class="stat-header">
+                            <div class="stat-label">Avg / Booking</div>
+                            <div class="stat-icon">💳</div>
+                        </div>
+                        <div class="stat-value">₱0</div>
+                        <div class="stat-change">No data yet</div>
+                    </div>
+                    <div class="stat-card" style="--card-color:var(--purple)">
+                        <div class="stat-header">
+                            <div class="stat-label">Add-On Revenue</div>
+                            <div class="stat-icon">✨</div>
+                        </div>
+                        <div class="stat-value" id="stat-avg-booking">₱0</div>
+                        <div class="stat-change">No data yet</div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Revenue Breakdown — 2026</div>
+                            <div class="chart-sub">Monthly bar chart</div>
+                        </div>
+                    </div>
+                    <div class="bar-chart" id="revenueChart2"></div>
+                </div>
+            </div>
+
+            <!-- ===== PAGE: OCCUPANCY ===== -->
+            <div class="dashboard-page hidden" id="page-occupancy">
+                <div class="stats-row" style="margin-bottom:2rem;">
+                    <div class="stat-card" style="--card-color:var(--green)">
+                        <div class="stat-header">
+                            <div class="stat-label">Current Occupancy</div>
+                            <div class="stat-icon">🏨</div>
+                        </div>
+                        <div class="stat-value">0%</div>
+                        <div class="stat-change">No data yet</div>
+                    </div>
+                    <div class="stat-card" style="--card-color:var(--gold)">
+                        <div class="stat-header">
+                            <div class="stat-label">Rooms Available</div>
+                            <div class="stat-icon">🔓</div>
+                        </div>
+                        <div class="stat-value">0</div>
+                        <div class="stat-change">No data yet</div>
+                    </div>
+                    <div class="stat-card" style="--card-color:var(--blue)">
+                        <div class="stat-header">
+                            <div class="stat-label">Avg Stay Length</div>
+                            <div class="stat-icon">🗓️</div>
+                        </div>
+                        <div class="stat-value">0</div>
+                        <div class="stat-change">No data yet</div>
+                    </div>
+                    <div class="stat-card" style="--card-color:var(--purple)">
+                        <div class="stat-header">
+                            <div class="stat-label">Upcoming Check-Ins</div>
+                            <div class="stat-icon">➡️</div>
+                        </div>
+                        <div class="stat-value">0</div>
+                        <div class="stat-change">No data yet</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PAGE: SETTINGS ===== -->
+            <div class="dashboard-page hidden" id="page-settings">
+                <div class="settings-grid">
+                    <div class="settings-section">
+                        <div class="settings-title">💰 Pricing Settings</div>
+                        <div class="settings-row">
+                            <span class="row-label">Single Room</span>
+                            <span style="color:var(--gold); border-bottom: 1px dashed var(--border);"
+                                contenteditable="true" id="price-single">180</span><span style="color:var(--gold);"> /
+                                night</span>
+                        </div>
+                        <div class="settings-row">
+                            <span class="row-label">Deluxe Room</span>
+                            <span style="color:var(--gold); border-bottom: 1px dashed var(--border);"
+                                contenteditable="true" id="price-deluxe">320</span><span style="color:var(--gold);"> /
+                                night</span>
+                        </div>
+                        <div class="settings-row">
+                            <span class="row-label">Family Room</span>
+                            <span style="color:var(--gold); border-bottom: 1px dashed var(--border);"
+                                contenteditable="true" id="price-family">420</span><span style="color:var(--gold);"> /
+                                night</span>
+                        </div>
+                        <div class="settings-row">
+                            <button class="topbar-btn primary"
+                                style="margin-top: 1rem; width: 100%; justify-content: center;" onclick="savePricing()">
+                                💾 Save Prices
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /main-content -->
+    </div><!-- /admin-layout -->
+
+    <script src="admin.js"></script>
+</body>
+
+</html>
