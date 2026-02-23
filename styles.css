@@ -386,18 +386,13 @@ section {
 }
 
 .booking-bar {
-  background: var(--bg-glass);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.75rem 2rem;
+  background: transparent;
+  padding: 1.75rem 0;
   display: flex;
   gap: 1.25rem;
   align-items: flex-end;
-  box-shadow: var(--shadow);
   max-width: 1240px;
-  margin: 0 auto;
+  margin: 0;
 }
 
 .booking-field {
