@@ -10,32 +10,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // 0. DYNAMIC PRICING SYNC
     // ----------------------------------------------------------
     async function getPricing() {
-        if (!window.supabaseClient) return { prices: { single: 180, deluxe: 320, family: 420 } };
-        const { data } = await window.supabaseClient.from('settings').select('prices').eq('id', 1).single();
-        return data || { prices: { single: 180, deluxe: 320, family: 420 } };
+        if (!window.supabaseClient) return { prices: { single: 180, deluxe: 320, family: 420 }, rate_plans: [] };
+        const { data, error } = await window.supabaseClient.from('settings').select('*').eq('id', 1).single();
+        if (error) console.warn('getPricing error:', error.message);
+        return data || { prices: { single: 180, deluxe: 320, family: 420 }, rate_plans: [] };
     }
 
-    // Helper: get best active discount for a room type (from Supabase)
-    async function getBestDiscount(roomType) {
-        let plans = [];
-        try {
-            const { data } = await window.supabaseClient
-                .from('settings').select('rate_plans').eq('id', 1).single();
-            plans = data?.rate_plans || [];
-        } catch { }
-
+    // Helper: get best active discount for a room type from plans array
+    function getBestDiscount(roomType, plans) {
+        if (!plans || !plans.length) return { discount: 0, planName: '' };
         const today = new Date().toISOString().split('T')[0];
 
         let bestDiscount = 0;
         let bestPlanName = '';
         plans.forEach(p => {
             if (!p.active) return;
-            // Check room applicability
             if (p.rooms !== 'all' && p.rooms !== roomType) return;
-            // Check date validity
             if (p.validFrom && today < p.validFrom) return;
             if (p.validUntil && today > p.validUntil) return;
-            // Keep best discount
             if (p.discount > bestDiscount) {
                 bestDiscount = p.discount;
                 bestPlanName = p.name;
@@ -46,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function applyDynamicPricing() {
         const config = await getPricing();
+        const ratePlans = config.rate_plans || [];
 
         // 1. Update Room Cards (index.html / rooms.html)
         const roomCards = document.querySelectorAll('.room-card');
@@ -62,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (name?.includes('family')) { price = config.prices.family; roomKey = 'family'; }
 
             if (price > 0) {
-                const { discount, planName } = await getBestDiscount(roomKey);
+                const { discount, planName } = getBestDiscount(roomKey, ratePlans);
 
                 // Remove any previous promo elements
                 card.querySelector('.promo-badge')?.remove();
@@ -70,13 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.querySelector('.promo-label')?.remove();
 
                 if (discount > 0) {
-                    // Calculate discounted price
                     const promoPrice = Math.round(price * (1 - discount / 100));
 
-                    // Show crossed-out original + promo price
                     if (amountEl) amountEl.textContent = `₱${promoPrice.toLocaleString()}`;
 
-                    // Insert original price (crossed out) before the amount
                     if (priceWrap && !priceWrap.querySelector('.original-price')) {
                         const origEl = document.createElement('div');
                         origEl.className = 'original-price';
@@ -89,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         priceWrap.appendChild(labelEl);
                     }
 
-                    // Add promo badge to image
                     const imgWrap = card.querySelector('.room-img');
                     if (imgWrap && !imgWrap.querySelector('.promo-badge')) {
                         const badge = document.createElement('span');
@@ -98,14 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         imgWrap.appendChild(badge);
                     }
 
-                    // Update booking link with promo price
                     if (bookBtn) {
                         const url = new URL(bookBtn.href, window.location.origin);
                         url.searchParams.set('price', promoPrice);
                         bookBtn.href = url.pathname + url.search;
                     }
                 } else {
-                    // No promo — show normal price
                     if (amountEl) amountEl.textContent = `₱${price.toLocaleString()}`;
                     if (bookBtn) {
                         const url = new URL(bookBtn.href, window.location.origin);
@@ -128,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (val.includes('family')) { basePrice = config.prices.family; roomKey = 'family'; }
 
                 if (basePrice > 0) {
-                    const { discount } = await getBestDiscount(roomKey);
+                    const { discount } = getBestDiscount(roomKey, ratePlans);
                     const finalPrice = discount > 0 ? Math.round(basePrice * (1 - discount / 100)) : basePrice;
                     opt.dataset.price = finalPrice;
                 }
