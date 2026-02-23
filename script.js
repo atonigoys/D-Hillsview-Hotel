@@ -15,10 +15,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return data || { prices: { single: 180, deluxe: 320, family: 420 } };
     }
 
-    // Helper: get best active discount for a room type
-    function getBestDiscount(roomType) {
+    // Helper: get best active discount for a room type (from Supabase)
+    async function getBestDiscount(roomType) {
         let plans = [];
-        try { plans = JSON.parse(localStorage.getItem('dhv_rate_plans') || '[]'); } catch { }
+        try {
+            const { data } = await window.supabaseClient
+                .from('settings').select('rate_plans').eq('id', 1).single();
+            plans = data?.rate_plans || [];
+        } catch { }
+
         const today = new Date().toISOString().split('T')[0];
 
         let bestDiscount = 0;
@@ -43,7 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const config = await getPricing();
 
         // 1. Update Room Cards (index.html / rooms.html)
-        document.querySelectorAll('.room-card').forEach(card => {
+        const roomCards = document.querySelectorAll('.room-card');
+        for (const card of roomCards) {
             const name = card.querySelector('.room-name')?.textContent.toLowerCase();
             const amountEl = card.querySelector('.amount');
             const bookBtn = card.querySelector('.btn-book');
@@ -56,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (name?.includes('family')) { price = config.prices.family; roomKey = 'family'; }
 
             if (price > 0) {
-                const { discount, planName } = getBestDiscount(roomKey);
+                const { discount, planName } = await getBestDiscount(roomKey);
 
                 // Remove any previous promo elements
                 card.querySelector('.promo-badge')?.remove();
@@ -108,12 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
-        });
+        }
 
         // 2. Update Booking Page Select Options
         const roomSel = document.getElementById('b-room');
         if (roomSel) {
-            [...roomSel.options].forEach(opt => {
+            for (const opt of [...roomSel.options]) {
                 const val = opt.value.toLowerCase();
                 let basePrice = 0;
                 let roomKey = '';
@@ -122,11 +128,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (val.includes('family')) { basePrice = config.prices.family; roomKey = 'family'; }
 
                 if (basePrice > 0) {
-                    const { discount } = getBestDiscount(roomKey);
+                    const { discount } = await getBestDiscount(roomKey);
                     const finalPrice = discount > 0 ? Math.round(basePrice * (1 - discount / 100)) : basePrice;
                     opt.dataset.price = finalPrice;
                 }
-            });
+            }
             updatePriceSummary();
         }
     }

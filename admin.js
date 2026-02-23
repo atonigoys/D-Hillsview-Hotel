@@ -716,14 +716,22 @@ async function saveBaseRate(roomType) {
 }
 
 // ----------------------------------------------------------
-// RATE PLANS & PACKAGES (localStorage)
+// RATE PLANS & PACKAGES (Supabase)
 // ----------------------------------------------------------
-function getPlans() {
-    try { return JSON.parse(localStorage.getItem('dhv_rate_plans') || '[]'); }
-    catch { return []; }
+async function getPlans() {
+    try {
+        const { data } = await window.supabaseClient
+            .from('settings').select('rate_plans').eq('id', 1).single();
+        return data?.rate_plans || [];
+    } catch {
+        return [];
+    }
 }
-function savePlansToStorage(plans) {
-    localStorage.setItem('dhv_rate_plans', JSON.stringify(plans));
+async function savePlansToStorage(plans) {
+    await window.supabaseClient
+        .from('settings')
+        .update({ rate_plans: plans })
+        .eq('id', 1);
 }
 
 function showAddPlanForm() {
@@ -744,7 +752,7 @@ function hideAddPlanForm() {
     if (nights) nights.value = '1';
 }
 
-function savePlan() {
+async function savePlan() {
     const name = document.getElementById('planName')?.value.trim();
     const discount = parseInt(document.getElementById('planDiscount')?.value, 10);
     const rooms = document.getElementById('planRooms')?.value;
@@ -758,7 +766,7 @@ function savePlan() {
         return;
     }
 
-    const plans = getPlans();
+    const plans = await getPlans();
     plans.push({
         id: Date.now().toString(36),
         name, discount, rooms, minNights, desc,
@@ -766,19 +774,19 @@ function savePlan() {
         active: true,
         createdAt: new Date().toISOString()
     });
-    savePlansToStorage(plans);
+    await savePlansToStorage(plans);
     hideAddPlanForm();
-    renderRatePlans();
+    await renderRatePlans();
     showToast(`✅ Rate plan "${name}" created!`);
 }
 
-function togglePlan(id) {
-    const plans = getPlans();
+async function togglePlan(id) {
+    const plans = await getPlans();
     const plan = plans.find(p => p.id === id);
     if (plan) {
         plan.active = !plan.active;
-        savePlansToStorage(plans);
-        renderRatePlans();
+        await savePlansToStorage(plans);
+        await renderRatePlans();
         showToast(`${plan.active ? '✅ Activated' : '⏸️ Deactivated'}: ${plan.name}`);
     }
 }
@@ -786,19 +794,19 @@ function togglePlan(id) {
 async function deletePlan(id) {
     const ok = await showConfirm('Are you sure you want to delete this rate plan?', 'Delete Plan', '🗑️');
     if (!ok) return;
-    let plans = getPlans();
+    let plans = await getPlans();
     plans = plans.filter(p => p.id !== id);
-    savePlansToStorage(plans);
-    renderRatePlans();
+    await savePlansToStorage(plans);
+    await renderRatePlans();
     showToast('🗑️ Rate plan deleted.');
 }
 
-function renderRatePlans() {
+async function renderRatePlans() {
     const grid = document.getElementById('plansGrid');
     const empty = document.getElementById('plansEmpty');
     if (!grid) return;
 
-    const plans = getPlans();
+    const plans = await getPlans();
 
     if (plans.length === 0) {
         if (empty) empty.style.display = '';

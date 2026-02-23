@@ -28,6 +28,14 @@ INSERT INTO public.settings (id, prices, inventory, tax_rate)
 VALUES (1, '{"single": 180, "deluxe": 320, "family": 420}', '{"single": 10, "deluxe": 10, "family": 10}', 0)
 ON CONFLICT (id) DO NOTHING;
 
+-- 4. Add rate_plans column (for promo/package pricing)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='settings' AND column_name='rate_plans') THEN
+        ALTER TABLE public.settings ADD COLUMN rate_plans jsonb NOT NULL DEFAULT '[]'::jsonb;
+    END IF;
+END $$;
+
 -- 1. Ensure the 'guest' column exists (in case it was missed)
 DO $$ 
 BEGIN
