@@ -149,11 +149,30 @@ section {
 .nav-logo {
   height: 60px;
   width: auto;
+  margin-right: 0.75rem;
   transition: var(--transition);
 }
 
 .scrolled .nav-logo {
   height: 50px;
+}
+
+.logo-text-nav {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.logo-text-nav span {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  margin-top: -2px;
 }
 
 .sidebar-logo-img {
