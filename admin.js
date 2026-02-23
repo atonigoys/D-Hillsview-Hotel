@@ -347,14 +347,14 @@ async function renderRoomsGrid() {
                     Base Price: ₱${config.prices[r.id]} / night
                 </div>
                 
-                <div style="background:rgba(255,255,255,0.03); padding:1rem; border-radius:8px; border:1px solid var(--border-light);">
-                    <label style="display:block; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.5rem;">
+                <div style="background:rgba(255,255,255,0.035); padding:1.25rem 1rem; border-radius:10px; border:1px solid var(--border-light);">
+                    <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:0.75rem;">
                         How many rooms available
                     </label>
-                    <div style="display:flex; gap:0.5rem;">
+                    <div style="display:flex; gap:0.75rem;">
                         <input type="number" id="inv-${r.id}" value="${config.inventory[r.id]}" 
-                               style="flex:1; background:var(--bg-card); border:1px solid var(--border); color:var(--text-primary); padding:0.4rem; border-radius:4px; font-weight:600;">
-                        <button class="topbar-btn primary" style="padding:0.4rem 0.8rem;" onclick="updateInventory('${r.id}')">Record</button>
+                               style="flex:1; background:var(--bg-card); border:1px solid var(--border); color:var(--text-primary); padding:0.5rem; border-radius:6px; font-weight:600; font-size:1rem;">
+                        <button class="topbar-btn primary" style="padding:0.5rem 1rem; min-width:90px; justify-content:center;" onclick="updateInventory('${r.id}')">Record</button>
                     </div>
                 </div>
             </div>
