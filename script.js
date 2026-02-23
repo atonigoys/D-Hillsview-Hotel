@@ -466,17 +466,7 @@ async function handleBookingSubmit() {
         return;
     }
 
-    // Send email confirmation
-    sendConfirmationEmail({
-        ref,
-        guest_name: guestName,
-        email,
-        room: roomName,
-        checkin: ci2,
-        checkout: co2,
-        nights,
-        amount: '₱' + total.toLocaleString(),
-    });
+    // (Email will be sent by admin upon confirmation)
 
     document.getElementById('bookingSummaryText').textContent =
         `${guestName} · ${roomName} · ${nights} night${nights > 1 ? 's' : ''} (${ci2} → ${co2})`;
