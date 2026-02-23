@@ -35,7 +35,7 @@ function applyPermissions() {
         console.log('🛡️ Applying Booking Staff restrictions...');
 
         // Hide Restricted Sidebar items
-        const restrictedPages = ['overview', 'rooms', 'guests', 'settings'];
+        const restrictedPages = ['overview', 'rooms', 'rates', 'guests', 'settings'];
         restrictedPages.forEach(p => {
             const item = document.querySelector(`.nav-item[data-page="${p}"]`);
             if (item) item.style.display = 'none';
@@ -110,6 +110,7 @@ function switchPage(el, pageId) {
     // Special handling for specific pages
     if (pageId === 'overview') refreshDashboard();
     if (pageId === 'rooms') renderRoomsGrid();
+    if (pageId === 'rates') renderRatesPage();
 }
 
 // ----------------------------------------------------------
@@ -589,6 +590,405 @@ async function savePricing() {
 
     showToast('✅ Prices saved successfully!');
     await refreshDashboard();
+}
+
+// ----------------------------------------------------------
+// RATES & AVAILABILITY PAGE
+// ----------------------------------------------------------
+let matrixStartDate = new Date();
+matrixStartDate.setHours(0, 0, 0, 0);
+// Snap to Monday
+const dayOfWeek = matrixStartDate.getDay();
+matrixStartDate.setDate(matrixStartDate.getDate() - ((dayOfWeek + 6) % 7));
+
+function renderRatesPage() {
+    renderBaseRates();
+    renderRatePlans();
+    renderAvailMatrix(matrixStartDate);
+}
+
+// Sub-Tab Switching
+function switchRatesTab(el, tabId) {
+    document.querySelectorAll('.rates-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.rates-subtab').forEach(s => s.classList.add('hidden'));
+    const target = document.getElementById(`subtab-${tabId}`);
+    if (target) target.classList.remove('hidden');
+
+    if (tabId === 'base-rates') renderBaseRates();
+    if (tabId === 'rate-plans') renderRatePlans();
+    if (tabId === 'avail-matrix') renderAvailMatrix(matrixStartDate);
+}
+
+// ----------------------------------------------------------
+// BASE RATES
+// ----------------------------------------------------------
+async function renderBaseRates() {
+    const grid = document.getElementById('rateCardsGrid');
+    if (!grid) return;
+
+    const { data: config, error } = await window.supabaseClient
+        .from('settings').select('*').eq('id', 1).single();
+    if (error) return;
+
+    const rooms = [
+        { id: 'single', name: 'Single Room', img: 'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=400&q=70', maxGuests: 2, extraFee: 50 },
+        { id: 'deluxe', name: 'Deluxe Room', img: 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=400&q=70', maxGuests: 3, extraFee: 80 },
+        { id: 'family', name: 'Family Room', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=70', maxGuests: 5, extraFee: 100 }
+    ];
+
+    const prices = config.prices;
+    const inventory = config.inventory;
+    const vals = Object.values(prices);
+    const avg = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+
+    if (document.getElementById('stat-avg-rate')) document.getElementById('stat-avg-rate').textContent = `₱${avg.toLocaleString()}`;
+    if (document.getElementById('stat-min-rate')) document.getElementById('stat-min-rate').textContent = `₱${min.toLocaleString()}`;
+    if (document.getElementById('stat-max-rate')) document.getElementById('stat-max-rate').textContent = `₱${max.toLocaleString()}`;
+
+    grid.innerHTML = rooms.map(r => `
+        <div class="rate-card">
+            <div class="rate-card-img">
+                <img src="${r.img}" alt="${r.name}">
+            </div>
+            <div class="rate-card-body">
+                <div class="rate-card-name">${r.name}</div>
+                <div class="rate-field-group">
+                    <div class="rate-field">
+                        <span class="rate-field-label">Nightly Rate (₱)</span>
+                        <input type="number" class="rate-input" id="rate-price-${r.id}" value="${prices[r.id]}" min="0">
+                    </div>
+                    <div class="rate-field">
+                        <span class="rate-field-label">Inventory</span>
+                        <input type="number" class="rate-input" id="rate-inv-${r.id}" value="${inventory[r.id]}" min="0" style="width:80px;">
+                    </div>
+                    <div class="rate-field">
+                        <span class="rate-field-label">Max Guests</span>
+                        <span style="font-weight:600; color:var(--text-primary);">${r.maxGuests}</span>
+                    </div>
+                    <div class="rate-field">
+                        <span class="rate-field-label">Extra Person Fee</span>
+                        <span style="font-weight:600; color:var(--gold);">₱${r.extraFee}</span>
+                    </div>
+                </div>
+                <div class="rate-card-actions">
+                    <button class="topbar-btn primary" style="width:100%; justify-content:center;" onclick="saveBaseRate('${r.id}')">
+                        💾 Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function saveBaseRate(roomType) {
+    const priceInput = document.getElementById(`rate-price-${roomType}`);
+    const invInput = document.getElementById(`rate-inv-${roomType}`);
+    const newPrice = parseInt(priceInput.value, 10);
+    const newInv = parseInt(invInput.value, 10);
+
+    if (isNaN(newPrice) || newPrice < 0 || isNaN(newInv) || newInv < 0) {
+        showToast('Please enter valid values.', 'error');
+        return;
+    }
+
+    const { data: config, error: fErr } = await window.supabaseClient
+        .from('settings').select('*').eq('id', 1).single();
+    if (fErr) return;
+
+    const newPrices = { ...config.prices, [roomType]: newPrice };
+    const newInventory = { ...config.inventory, [roomType]: newInv };
+
+    const { error } = await window.supabaseClient
+        .from('settings')
+        .update({ prices: newPrices, inventory: newInventory })
+        .eq('id', 1);
+
+    if (error) {
+        showToast('Save failed: ' + error.message, 'error');
+        return;
+    }
+
+    showToast(`✅ ${roomType.charAt(0).toUpperCase() + roomType.slice(1)} Room rate & inventory updated!`);
+    renderBaseRates();
+}
+
+// ----------------------------------------------------------
+// RATE PLANS & PACKAGES (localStorage)
+// ----------------------------------------------------------
+function getPlans() {
+    try { return JSON.parse(localStorage.getItem('dhv_rate_plans') || '[]'); }
+    catch { return []; }
+}
+function savePlansToStorage(plans) {
+    localStorage.setItem('dhv_rate_plans', JSON.stringify(plans));
+}
+
+function showAddPlanForm() {
+    const wrap = document.getElementById('planFormWrap');
+    if (wrap) wrap.classList.remove('hidden');
+}
+function hideAddPlanForm() {
+    const wrap = document.getElementById('planFormWrap');
+    if (wrap) wrap.classList.add('hidden');
+    // Clear fields
+    ['planName', 'planDiscount', 'planDesc', 'planFrom', 'planUntil'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    const rooms = document.getElementById('planRooms');
+    if (rooms) rooms.value = 'all';
+    const nights = document.getElementById('planMinNights');
+    if (nights) nights.value = '1';
+}
+
+function savePlan() {
+    const name = document.getElementById('planName')?.value.trim();
+    const discount = parseInt(document.getElementById('planDiscount')?.value, 10);
+    const rooms = document.getElementById('planRooms')?.value;
+    const minNights = parseInt(document.getElementById('planMinNights')?.value, 10) || 1;
+    const desc = document.getElementById('planDesc')?.value.trim();
+    const from = document.getElementById('planFrom')?.value;
+    const until = document.getElementById('planUntil')?.value;
+
+    if (!name || isNaN(discount) || discount < 1 || discount > 100) {
+        showToast('Please fill in plan name and a valid discount (1-100%).', 'error');
+        return;
+    }
+
+    const plans = getPlans();
+    plans.push({
+        id: Date.now().toString(36),
+        name, discount, rooms, minNights, desc,
+        validFrom: from, validUntil: until,
+        active: true,
+        createdAt: new Date().toISOString()
+    });
+    savePlansToStorage(plans);
+    hideAddPlanForm();
+    renderRatePlans();
+    showToast(`✅ Rate plan "${name}" created!`);
+}
+
+function togglePlan(id) {
+    const plans = getPlans();
+    const plan = plans.find(p => p.id === id);
+    if (plan) {
+        plan.active = !plan.active;
+        savePlansToStorage(plans);
+        renderRatePlans();
+        showToast(`${plan.active ? '✅ Activated' : '⏸️ Deactivated'}: ${plan.name}`);
+    }
+}
+
+async function deletePlan(id) {
+    const ok = await showConfirm('Are you sure you want to delete this rate plan?', 'Delete Plan', '🗑️');
+    if (!ok) return;
+    let plans = getPlans();
+    plans = plans.filter(p => p.id !== id);
+    savePlansToStorage(plans);
+    renderRatePlans();
+    showToast('🗑️ Rate plan deleted.');
+}
+
+function renderRatePlans() {
+    const grid = document.getElementById('plansGrid');
+    const empty = document.getElementById('plansEmpty');
+    if (!grid) return;
+
+    const plans = getPlans();
+
+    if (plans.length === 0) {
+        if (empty) empty.style.display = '';
+        // Remove any plan cards but keep empty state
+        grid.querySelectorAll('.plan-card').forEach(c => c.remove());
+        return;
+    }
+
+    if (empty) empty.style.display = 'none';
+
+    const roomLabels = { all: 'All Rooms', single: 'Single', deluxe: 'Deluxe', family: 'Family' };
+
+    grid.innerHTML = plans.map(p => `
+        <div class="plan-card ${p.active ? '' : 'inactive'}">
+            <div class="plan-card-header">
+                <div class="plan-card-name">${p.name}</div>
+                <label class="toggle" title="${p.active ? 'Active' : 'Inactive'}">
+                    <input type="checkbox" ${p.active ? 'checked' : ''} onchange="togglePlan('${p.id}')">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            ${p.desc ? `<div class="plan-card-desc">${p.desc}</div>` : ''}
+            <div class="plan-card-meta">
+                <span class="plan-meta-tag">🛏️ ${roomLabels[p.rooms] || p.rooms}</span>
+                <span class="plan-meta-tag">🌙 Min ${p.minNights} night${p.minNights > 1 ? 's' : ''}</span>
+                ${p.validFrom ? `<span class="plan-meta-tag">📅 ${p.validFrom}</span>` : ''}
+                ${p.validUntil ? `<span class="plan-meta-tag">⏰ Until ${p.validUntil}</span>` : ''}
+            </div>
+            <div class="plan-card-footer">
+                <div class="plan-discount">-${p.discount}%</div>
+                <div style="display:flex; gap:0.4rem;">
+                    <button class="topbar-btn" style="padding:0.4rem 0.6rem; color:var(--red);" title="Delete" onclick="deletePlan('${p.id}')">🗑️</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ----------------------------------------------------------
+// AVAILABILITY MATRIX
+// ----------------------------------------------------------
+async function renderAvailMatrix(startDate) {
+    const table = document.getElementById('availMatrix');
+    const rangeLabel = document.getElementById('matrixDateRange');
+    if (!table) return;
+
+    // Fetch bookings and settings
+    const [bookingsRes, settingsRes] = await Promise.all([
+        window.supabaseClient.from('bookings').select('*'),
+        window.supabaseClient.from('settings').select('*').eq('id', 1).single()
+    ]);
+
+    const bookings = bookingsRes.data || [];
+    const config = settingsRes.data || { inventory: { single: 10, deluxe: 10, family: 10 } };
+
+    const rooms = [
+        { id: 'single', name: 'Single Room' },
+        { id: 'deluxe', name: 'Deluxe Room' },
+        { id: 'family', name: 'Family Room' }
+    ];
+
+    // Generate 7 dates
+    const dates = [];
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(startDate);
+        d.setDate(d.getDate() + i);
+        dates.push(d);
+    }
+
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    // Update label
+    const startLabel = `${monthNames[dates[0].getMonth()]} ${dates[0].getDate()}`;
+    const endLabel = `${monthNames[dates[6].getMonth()]} ${dates[6].getDate()}, ${dates[6].getFullYear()}`;
+    if (rangeLabel) rangeLabel.textContent = `${startLabel} — ${endLabel}`;
+
+    // Count bookings per room per date
+    function countBookingsForDate(roomType, date) {
+        const dateStr = date.toISOString().split('T')[0];
+        return bookings.filter(b => {
+            const r = b.room.toLowerCase();
+            if (!r.includes(roomType)) return false;
+            if (b.status === 'cancelled') return false;
+            return b.checkin <= dateStr && b.checkout > dateStr;
+        }).length;
+    }
+
+    // Build table
+    let html = '<thead><tr><th>Room Type</th>';
+    dates.forEach(d => {
+        const isToday = d.toDateString() === new Date().toDateString();
+        html += `<th style="${isToday ? 'color:var(--gold);' : ''}">${dayNames[d.getDay()]}<br>${d.getDate()} ${monthNames[d.getMonth()]}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    // Room rows
+    const summaryAvail = new Array(7).fill(0);
+    rooms.forEach(room => {
+        html += `<tr><td>${room.name}</td>`;
+        dates.forEach((d, i) => {
+            const bookedCount = countBookingsForDate(room.id, d);
+            const totalInv = config.inventory[room.id] || 10;
+            const available = Math.max(totalInv - bookedCount, 0);
+            summaryAvail[i] += available;
+
+            let status = 'available';
+            if (available === 0) status = 'booked';
+            else if (available <= Math.ceil(totalInv * 0.3)) status = 'low';
+
+            const dateStr = d.toISOString().split('T')[0];
+            html += `<td><div class="avail-cell ${status}" onclick="showDateAvailability('${dateStr}')" title="${available}/${totalInv} available">${available}</div></td>`;
+        });
+        html += '</tr>';
+    });
+
+    // Summary row
+    html += '<tr class="summary-row"><td>Total Available</td>';
+    summaryAvail.forEach(val => {
+        html += `<td>${val}</td>`;
+    });
+    html += '</tr></tbody>';
+
+    table.innerHTML = html;
+}
+
+function navigateMatrix(days) {
+    if (days === 0) {
+        matrixStartDate = new Date();
+        matrixStartDate.setHours(0, 0, 0, 0);
+        const dow = matrixStartDate.getDay();
+        matrixStartDate.setDate(matrixStartDate.getDate() - ((dow + 6) % 7));
+    } else {
+        matrixStartDate.setDate(matrixStartDate.getDate() + days);
+    }
+    renderAvailMatrix(matrixStartDate);
+}
+
+async function showDateAvailability(dateStr) {
+    const panel = document.getElementById('availDetailPanel');
+    const title = document.getElementById('availDetailTitle');
+    const body = document.getElementById('availDetailBody');
+    if (!panel || !title || !body) return;
+
+    const d = new Date(dateStr + 'T00:00:00');
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    title.textContent = `📅 ${monthNames[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+
+    const [bookingsRes, settingsRes] = await Promise.all([
+        window.supabaseClient.from('bookings').select('*'),
+        window.supabaseClient.from('settings').select('*').eq('id', 1).single()
+    ]);
+
+    const bookings = bookingsRes.data || [];
+    const config = settingsRes.data || { inventory: { single: 10, deluxe: 10, family: 10 }, prices: { single: 180, deluxe: 320, family: 420 } };
+
+    const rooms = [
+        { id: 'single', name: 'Single Room' },
+        { id: 'deluxe', name: 'Deluxe Room' },
+        { id: 'family', name: 'Family Room' }
+    ];
+
+    body.innerHTML = rooms.map(room => {
+        const bookedCount = bookings.filter(b => {
+            const r = b.room.toLowerCase();
+            if (!r.includes(room.id)) return false;
+            if (b.status === 'cancelled') return false;
+            return b.checkin <= dateStr && b.checkout > dateStr;
+        }).length;
+
+        const totalInv = config.inventory[room.id] || 10;
+        const available = Math.max(totalInv - bookedCount, 0);
+        let status = 'confirmed';
+        if (available === 0) status = 'cancelled';
+        else if (available <= Math.ceil(totalInv * 0.3)) status = 'pending';
+
+        return `
+            <div class="avail-detail-room">
+                <div>
+                    <div style="font-weight:600;">${room.name}</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">₱${config.prices[room.id]} / night</div>
+                </div>
+                <div style="text-align:right;">
+                    <span class="badge ${status}">${available}/${totalInv} avail.</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    panel.classList.remove('hidden');
 }
 
 /**

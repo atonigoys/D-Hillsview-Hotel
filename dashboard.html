@@ -50,6 +50,9 @@
                 <div class="nav-item" data-page="rooms" onclick="switchPage(this, 'rooms')">
                     <span class="nav-icon">🛏️</span> Rooms
                 </div>
+                <div class="nav-item" data-page="rates" onclick="switchPage(this, 'rates')">
+                    <span class="nav-icon">💲</span> Rates & Availability
+                </div>
                 <div class="nav-item" data-page="guests" onclick="switchPage(this, 'guests')">
                     <span class="nav-icon">👥</span> Guests
                 </div>
@@ -288,6 +291,163 @@
                 <div class="admin-rooms-grid" id="adminRoomsGrid"></div>
             </div>
 
+            <!-- ===== PAGE: RATES & AVAILABILITY ===== -->
+            <div class="dashboard-page hidden" id="page-rates">
+
+                <!-- Sub-Tab Navigation -->
+                <div class="rates-tabs">
+                    <button class="rates-tab active" onclick="switchRatesTab(this, 'base-rates')">💰 Base Rates</button>
+                    <button class="rates-tab" onclick="switchRatesTab(this, 'rate-plans')">🎁 Rate Plans &
+                        Packages</button>
+                    <button class="rates-tab" onclick="switchRatesTab(this, 'avail-matrix')">📅 Availability
+                        Matrix</button>
+                </div>
+
+                <!-- ──── SUB-TAB: BASE RATES ──── -->
+                <div class="rates-subtab" id="subtab-base-rates">
+                    <!-- Quick Stats -->
+                    <div class="rates-stats-row">
+                        <div class="stat-card" style="--card-color: var(--gold)">
+                            <div class="stat-header">
+                                <div class="stat-label">Avg. Nightly Rate</div>
+                                <div class="stat-icon">💰</div>
+                            </div>
+                            <div class="stat-value" id="stat-avg-rate">₱0</div>
+                            <div class="stat-change">Across all room types</div>
+                        </div>
+                        <div class="stat-card" style="--card-color: var(--green)">
+                            <div class="stat-header">
+                                <div class="stat-label">Min Rate</div>
+                                <div class="stat-icon">📉</div>
+                            </div>
+                            <div class="stat-value" id="stat-min-rate">₱0</div>
+                            <div class="stat-change">Lowest room type</div>
+                        </div>
+                        <div class="stat-card" style="--card-color: var(--purple)">
+                            <div class="stat-header">
+                                <div class="stat-label">Max Rate</div>
+                                <div class="stat-icon">📈</div>
+                            </div>
+                            <div class="stat-value" id="stat-max-rate">₱0</div>
+                            <div class="stat-change">Highest room type</div>
+                        </div>
+                    </div>
+
+                    <!-- Rate Cards -->
+                    <div class="rate-cards-grid" id="rateCardsGrid"></div>
+                </div>
+
+                <!-- ──── SUB-TAB: RATE PLANS & PACKAGES ──── -->
+                <div class="rates-subtab hidden" id="subtab-rate-plans">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem;">
+                        <div>
+                            <h2 style="font-family:'Playfair Display',serif; font-size:1.15rem;">Rate Plans & Packages
+                            </h2>
+                            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Create special offers,
+                                discounts, and seasonal packages</p>
+                        </div>
+                        <button class="topbar-btn primary" onclick="showAddPlanForm()">
+                            ➕ Add New Plan
+                        </button>
+                    </div>
+
+                    <!-- Add Plan Form (Hidden by default) -->
+                    <div class="plan-form-wrap hidden" id="planFormWrap">
+                        <div class="plan-form">
+                            <div class="plan-form-title">✨ Create New Rate Plan</div>
+                            <div class="plan-form-grid">
+                                <div class="plan-field">
+                                    <label>Plan Name</label>
+                                    <input type="text" id="planName" placeholder="e.g. Weekend Special">
+                                </div>
+                                <div class="plan-field">
+                                    <label>Discount %</label>
+                                    <input type="number" id="planDiscount" placeholder="e.g. 15" min="1" max="100">
+                                </div>
+                                <div class="plan-field">
+                                    <label>Applicable Rooms</label>
+                                    <select id="planRooms">
+                                        <option value="all">All Rooms</option>
+                                        <option value="single">Single Room</option>
+                                        <option value="deluxe">Deluxe Room</option>
+                                        <option value="family">Family Room</option>
+                                    </select>
+                                </div>
+                                <div class="plan-field">
+                                    <label>Min. Nights</label>
+                                    <input type="number" id="planMinNights" placeholder="1" min="1" value="1">
+                                </div>
+                                <div class="plan-field" style="grid-column: span 2;">
+                                    <label>Description</label>
+                                    <input type="text" id="planDesc" placeholder="Brief description of the offer">
+                                </div>
+                                <div class="plan-field">
+                                    <label>Valid From</label>
+                                    <input type="date" id="planFrom">
+                                </div>
+                                <div class="plan-field">
+                                    <label>Valid Until</label>
+                                    <input type="date" id="planUntil">
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:0.75rem; margin-top:1.25rem;">
+                                <button class="topbar-btn primary" onclick="savePlan()">💾 Save Plan</button>
+                                <button class="topbar-btn" onclick="hideAddPlanForm()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Plans Grid -->
+                    <div class="plans-grid" id="plansGrid">
+                        <div class="plan-empty" id="plansEmpty">
+                            <div style="font-size:2.5rem; margin-bottom:1rem;">🎁</div>
+                            <div style="font-size:1rem; font-weight:600; margin-bottom:0.5rem;">No Rate Plans Yet</div>
+                            <div style="font-size:0.82rem; color:var(--text-muted);">Create your first special offer or
+                                package to attract more guests.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ──── SUB-TAB: AVAILABILITY MATRIX ──── -->
+                <div class="rates-subtab hidden" id="subtab-avail-matrix">
+                    <div
+                        style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+                        <div>
+                            <h2 style="font-family:'Playfair Display',serif; font-size:1.15rem;">Availability Matrix
+                            </h2>
+                            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">7-day room
+                                availability overview</p>
+                        </div>
+                        <div class="avail-nav">
+                            <button class="topbar-btn" onclick="navigateMatrix(-7)">◀ Prev Week</button>
+                            <span class="avail-nav-label" id="matrixDateRange">—</span>
+                            <button class="topbar-btn" onclick="navigateMatrix(7)">Next Week ▶</button>
+                            <button class="topbar-btn" style="margin-left:0.5rem;"
+                                onclick="navigateMatrix(0)">Today</button>
+                        </div>
+                    </div>
+
+                    <!-- Legend -->
+                    <div class="avail-legend">
+                        <div class="avail-legend-item"><span class="avail-dot available"></span> Available</div>
+                        <div class="avail-legend-item"><span class="avail-dot booked"></span> Booked</div>
+                        <div class="avail-legend-item"><span class="avail-dot low"></span> Low Inventory</div>
+                    </div>
+
+                    <!-- Matrix Table -->
+                    <div class="avail-matrix-wrap">
+                        <table class="avail-matrix" id="availMatrix"></table>
+                    </div>
+
+                    <!-- Day Detail Panel -->
+                    <div class="avail-detail-panel hidden" id="availDetailPanel">
+                        <div class="avail-detail-title" id="availDetailTitle">—</div>
+                        <div class="avail-detail-body" id="availDetailBody"></div>
+                    </div>
+                </div>
+
+            </div>
+
             <!-- ===== PAGE: GUESTS ===== -->
             <div class="dashboard-page hidden" id="page-guests">
                 <div class="table-card">
@@ -443,6 +603,11 @@
 
         </div><!-- /main-content -->
     </div><!-- /admin-layout -->
+
+    <!-- Toast Container -->
+    <div id="toast-container"
+        style="position:fixed; top:1.5rem; right:1.5rem; z-index:99999; display:flex; flex-direction:column; gap:0.75rem; pointer-events:none;">
+    </div>
 
     <!-- Custom Confirm Modal -->
     <div class="modal-overlay" id="confirmActionModal">

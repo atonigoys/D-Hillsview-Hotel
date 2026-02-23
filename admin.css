@@ -1122,6 +1122,559 @@ img {
 }
 
 /* ============================================
+   RATES & AVAILABILITY PAGE
+   ============================================ */
+
+/* Sub-Tab Navigation */
+.rates-tabs {
+    display: flex;
+    gap: 0.25rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 0.35rem;
+    margin-bottom: 2rem;
+}
+
+.rates-tab {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.rates-tab:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.rates-tab.active {
+    background: rgba(201, 169, 110, 0.12);
+    color: var(--gold);
+    box-shadow: 0 2px 8px rgba(201, 169, 110, 0.15);
+}
+
+.rates-subtab.hidden {
+    display: none;
+}
+
+/* Stats row for rates (3 cols) */
+.rates-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+/* Rate Cards Grid */
+.rate-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1.5rem;
+}
+
+.rate-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.rate-card:hover {
+    border-color: var(--border);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+}
+
+.rate-card-img {
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+}
+
+.rate-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.rate-card:hover .rate-card-img img {
+    transform: scale(1.06);
+}
+
+.rate-card-body {
+    padding: 1.5rem;
+}
+
+.rate-card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+}
+
+.rate-field-group {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+    margin-bottom: 1rem;
+}
+
+.rate-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.rate-field:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.rate-field:first-child {
+    padding-top: 0;
+}
+
+.rate-field-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+}
+
+.rate-input {
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
+    color: var(--gold);
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: center;
+    width: 120px;
+    font-family: 'Inter', sans-serif;
+    transition: var(--transition);
+}
+
+.rate-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.15);
+}
+
+.rate-card-actions {
+    margin-top: 1.25rem;
+}
+
+/* Plan Form */
+.plan-form-wrap {
+    margin-bottom: 1.5rem;
+}
+
+.plan-form-wrap.hidden {
+    display: none;
+}
+
+.plan-form {
+    background: var(--bg-card);
+    border: 1px solid var(--gold-dark);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    position: relative;
+}
+
+.plan-form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-dark));
+}
+
+.plan-form-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+}
+
+.plan-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.plan-field label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    margin-bottom: 0.4rem;
+}
+
+.plan-field input,
+.plan-field select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 0.6rem 0.85rem;
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    outline: none;
+    transition: var(--transition);
+    box-sizing: border-box;
+}
+
+.plan-field input:focus,
+.plan-field select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.1);
+}
+
+/* Plan Cards Grid */
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.25rem;
+}
+
+.plan-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.plan-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gold);
+}
+
+.plan-card.inactive {
+    opacity: 0.5;
+}
+
+.plan-card.inactive::before {
+    background: var(--text-muted);
+}
+
+.plan-card:hover {
+    border-color: var(--border);
+    transform: translateY(-2px);
+}
+
+.plan-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.plan-card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.plan-card-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.plan-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.plan-meta-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.65rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-light);
+    border-radius: 50px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.plan-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+}
+
+.plan-discount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--green);
+    font-family: 'Playfair Display', serif;
+}
+
+.plan-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--bg-card);
+    border: 1px dashed var(--border-light);
+    border-radius: var(--radius);
+}
+
+/* Availability Matrix */
+.avail-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.avail-nav-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--gold);
+    min-width: 160px;
+    text-align: center;
+}
+
+.avail-legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.avail-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.avail-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.avail-dot.available {
+    background: var(--green);
+}
+
+.avail-dot.booked {
+    background: var(--red);
+}
+
+.avail-dot.low {
+    background: #d4a847;
+}
+
+.avail-matrix-wrap {
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-light);
+}
+
+.avail-matrix {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-card);
+}
+
+.avail-matrix th {
+    padding: 0.85rem 1rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--border-light);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.avail-matrix th:first-child {
+    text-align: left;
+    min-width: 140px;
+}
+
+.avail-matrix td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border-light);
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 500;
+    vertical-align: middle;
+}
+
+.avail-matrix td:first-child {
+    text-align: left;
+    font-weight: 600;
+    font-family: 'Playfair Display', serif;
+    color: var(--text-primary);
+}
+
+.avail-matrix tr:last-child td {
+    border-bottom: none;
+}
+
+.avail-matrix tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.avail-matrix .summary-row td {
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.03);
+    border-top: 2px solid var(--border);
+    color: var(--gold);
+}
+
+.avail-cell {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.avail-cell.available {
+    background: rgba(90, 224, 138, 0.12);
+    color: var(--green);
+}
+
+.avail-cell.booked {
+    background: rgba(224, 90, 90, 0.12);
+    color: var(--red);
+}
+
+.avail-cell.low {
+    background: rgba(212, 168, 71, 0.15);
+    color: #d4a847;
+}
+
+.avail-cell:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Detail Panel */
+.avail-detail-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-top: 1rem;
+    animation: modalScale 0.3s ease;
+}
+
+.avail-detail-panel.hidden {
+    display: none;
+}
+
+.avail-detail-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.avail-detail-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+.avail-detail-room {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    font-size: 0.85rem;
+}
+
+/* Responsive adjustments for rates page */
+@media (max-width: 1024px) {
+    .rates-stats-row {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .rate-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .plans-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .rates-tabs {
+        flex-direction: column;
+    }
+
+    .rates-stats-row {
+        grid-template-columns: 1fr;
+    }
+
+    .plan-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .plan-field[style*="span 2"] {
+        grid-column: span 1 !important;
+    }
+
+    .avail-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+/* ============================================
    MOBILE SIDEBAR TOGGLE
    ============================================ */
 .sidebar-toggle {
