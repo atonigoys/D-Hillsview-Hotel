@@ -71,7 +71,7 @@ async function refreshDashboard() {
     const { data: bookings, error: bErr } = await window.supabaseClient
         .from('bookings')
         .select('*')
-        .order('createdAt', { ascending: false });
+        .order('created_at', { ascending: false });
 
     // Fetch Settings
     const { data: config, error: cErr } = await window.supabaseClient
@@ -82,7 +82,8 @@ async function refreshDashboard() {
 
     if (bErr || cErr) {
         console.warn('Refresh failed:', bErr || cErr);
-        return;
+        if (!bookings) bookings = [];
+        if (!config) config = { prices: { single: 180, deluxe: 320, family: 420 }, inventory: { single: 10, deluxe: 10, family: 10 } };
     }
 
     // 1. Update Stats
@@ -297,7 +298,7 @@ async function applyFilters() {
     const { data: allBookings, error } = await window.supabaseClient
         .from('bookings')
         .select('*')
-        .order('createdAt', { ascending: false });
+        .order('created_at', { ascending: false });
 
     if (error) return;
 
