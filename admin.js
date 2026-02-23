@@ -282,7 +282,8 @@ function renderGuestsTable(bookings) {
 // BOOKING ACTIONS
 // ----------------------------------------------------------
 async function confirmBooking(ref) {
-    if (!confirm(`Are you sure you want to CONFIRM booking #${ref}?`)) return;
+    const ok = await showConfirm(`Are you sure you want to CONFIRM booking #${ref}?`, 'Confirm Booking', '✅');
+    if (!ok) return;
 
     const { data: booking, error } = await window.supabaseClient
         .from('bookings')
@@ -333,7 +334,8 @@ function sendConfirmationEmail(data) {
     });
 }
 async function cancelBooking(ref) {
-    if (!confirm(`Are you sure you want to cancel booking #${ref}?`)) return;
+    const ok = await showConfirm(`Are you sure you want to cancel booking #${ref}?`, 'Cancel Booking', '⚠️');
+    if (!ok) return;
 
     const { error } = await window.supabaseClient
         .from('bookings')
@@ -349,7 +351,8 @@ async function cancelBooking(ref) {
 }
 
 async function deleteBooking(ref) {
-    if (!confirm(`CRITICAL: Are you sure you want to PERMANENTLY DELETE booking #${ref}?`)) return;
+    const ok = await showConfirm(`CRITICAL: Are you sure you want to PERMANENTLY DELETE booking #${ref}?`, 'Delete Booking', '🗑️');
+    if (!ok) return;
 
     const { error } = await window.supabaseClient
         .from('bookings')
@@ -545,4 +548,41 @@ function showToast(message, type = 'success') {
         toast.classList.add('fade-out');
         setTimeout(() => toast.remove(), 400);
     }, 4000);
+}
+
+/**
+ * Custom Promise-based Confirmation Modal
+ */
+function showConfirm(message, title = 'Confirm', icon = '❓') {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('confirmActionModal');
+        const titleEl = document.getElementById('confirmTitle');
+        const msgEl = document.getElementById('confirmMessage');
+        const iconEl = document.getElementById('confirmIcon');
+        const proceedBtn = document.getElementById('confirmProceedBtn');
+        const cancelBtn = document.getElementById('confirmCancelBtn');
+
+        if (!modal || !titleEl || !msgEl || !proceedBtn || !cancelBtn) {
+            return resolve(window.confirm(message)); // Fallback
+        }
+
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+        if (iconEl) iconEl.textContent = icon;
+
+        modal.classList.add('active');
+
+        const cleanup = (result) => {
+            modal.classList.remove('active');
+            proceedBtn.removeEventListener('click', onProceed);
+            cancelBtn.removeEventListener('click', onCancel);
+            resolve(result);
+        };
+
+        const onProceed = () => cleanup(true);
+        const onCancel = () => cleanup(false);
+
+        proceedBtn.addEventListener('click', onProceed);
+        cancelBtn.addEventListener('click', onCancel);
+    });
 }

@@ -418,9 +418,19 @@
         </div><!-- /main-content -->
     </div><!-- /admin-layout -->
 
-    <!-- Toast Notification Container -->
-    <div id="toast-container"
-        style="position:fixed; top:2rem; right:2rem; z-index:11000; pointer-events:none; display:flex; flex-direction:column; gap:0.75rem;">
+    <!-- Custom Confirm Modal -->
+    <div class="modal-overlay" id="confirmActionModal">
+        <div class="modal-card" style="max-width: 400px; text-align: center;">
+            <div class="modal-icon" id="confirmIcon">❓</div>
+            <h2 id="confirmTitle">Confirm Action</h2>
+            <p id="confirmMessage" style="margin-bottom: 2rem; color: var(--text-muted); font-size: 0.95rem;"></p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button class="topbar-btn" style="flex: 1; justify-content: center;"
+                    id="confirmCancelBtn">Cancel</button>
+                <button class="topbar-btn primary" style="flex: 1; justify-content: center;"
+                    id="confirmProceedBtn">Proceed</button>
+            </div>
+        </div>
     </div>
 
     <script src="admin.js"></script>
