@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 0. DYNAMIC PRICING SYNC
     // ----------------------------------------------------------
     async function getPricing() {
-        if (!window.supabaseClient) return { prices: { single: 180, deluxe: 320, family: 420 }, taxRate: 0 };
-        const { data, error } = await window.supabaseClient.from('settings').select('*').eq('id', 1).single();
-        return data || { prices: { single: 180, deluxe: 320, family: 420 }, taxRate: 0 };
+        if (!window.supabaseClient) return { prices: { single: 180, deluxe: 320, family: 420 } };
+        const { data } = await window.supabaseClient.from('settings').select('prices').eq('id', 1).single();
+        return data || { prices: { single: 180, deluxe: 320, family: 420 } };
     }
 
     async function applyDynamicPricing() {
@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     applyDynamicPricing();
+
     // ----------------------------------------------------------
     // 1. NAVBAR SCROLL EFFECT
     // ----------------------------------------------------------
@@ -248,33 +249,24 @@ function getNights() {
 }
 
 // ----------------------------------------------------------
-// 5. PRICE SUMMARY CALCULATION
+// UPDATE PRICE SUMMARY
 // ----------------------------------------------------------
-async function updatePriceSummary() {
+function updatePriceSummary() {
     const roomSel = document.getElementById('b-room');
     const addonSel = document.getElementById('b-addons');
-    const summaryPanel = document.querySelector('.price-panel');
+    if (!roomSel) return;
 
-    if (!roomSel || !summaryPanel) return;
-
-    const config = await getPricing();
-    const roomOpt = roomSel.options[roomSel.selectedIndex];
-
-    // Sync the room price in the dataset just in case
-    const val = roomOpt.value.toLowerCase();
-    if (val.includes('single')) roomOpt.dataset.price = config.prices.single;
-    else if (val.includes('deluxe')) roomOpt.dataset.price = config.prices.deluxe;
-    else if (val.includes('family')) roomOpt.dataset.price = config.prices.family;
-
-    const roomName = roomOpt.value;
-    const roomPrice = parseInt(roomOpt.dataset.price, 10) || 0;
-    const roomImg = roomOpt.dataset.img || '';
+    const selectedOpt = roomSel.options[roomSel.selectedIndex];
+    const roomName = selectedOpt.value;
+    const roomPrice = parseInt(selectedOpt.dataset.price, 10) || 0;
+    const roomImg = selectedOpt.dataset.img || '';
     const nights = getNights();
 
     const addonOpt = addonSel?.options[addonSel.selectedIndex];
     const addonCost = parseInt(addonOpt?.dataset.cost, 10) || 0;
     const addonName = addonOpt?.value !== 'none' ? addonOpt?.text.split(' —')[0] : null;
 
+    const config = JSON.parse(localStorage.getItem('dhv_config') || '{"taxRate":0}');
     const subtotal = roomPrice * nights + addonCost;
     const total = subtotal;
 
@@ -314,7 +306,7 @@ async function updatePriceSummary() {
         show('priceTotal', true);
         text('pricePerNightLabel', `${roomName}`);
         text('pricePerNightVal', `₱${roomPrice}/night`);
-        text('nightsLabel', `x ${nights} night${nights > 1 ? 's' : ''}`);
+        text('nightsLabel', `× ${nights} night${nights > 1 ? 's' : ''}`);
         text('nightsVal', `₱${roomPrice * nights}`);
 
         if (addonName && addonCost) {
@@ -356,39 +348,7 @@ function handleHeroSearch() {
 // ----------------------------------------------------------
 // BOOKING FORM VALIDATION + SUBMIT
 // ----------------------------------------------------------
-/**
- * Checks if a room type is available for the given dates
- */
-async function isRoomAvailable(roomType, checkin, checkout) {
-    if (!window.supabaseClient) return true;
-
-    // Fetch Bookings and Config
-    const { data: bookings, error: bErr } = await window.supabaseClient.from('bookings').select('*');
-    const { data: config, error: cErr } = await window.supabaseClient.from('settings').select('*').eq('id', 1).single();
-
-    if (bErr || cErr) return true;
-
-    // Normalize room type to match inventory keys (single, deluxe, family)
-    const typeKey = roomType.toLowerCase().split(' ')[0];
-    const maxRooms = (config.inventory && config.inventory[typeKey]) ? config.inventory[typeKey] : 10;
-
-    const start = new Date(checkin);
-    const end = new Date(checkout);
-
-    const overlapping = (bookings || []).filter(b => {
-        if (b.status === 'cancelled') return false;
-        if (b.room.toLowerCase() !== roomType.toLowerCase()) return false;
-
-        const bStart = new Date(b.checkin);
-        const bEnd = new Date(b.checkout);
-
-        return (start < bEnd) && (bStart < end);
-    });
-
-    return overlapping.length < maxRooms;
-}
-
-async function handleBookingSubmit() {
+function handleBookingSubmit() {
     let valid = true;
 
     function validateField(groupId, inputId, condition, errMsg) {
@@ -440,68 +400,45 @@ async function handleBookingSubmit() {
     const phone = document.getElementById('b-phone')?.value || '';
     const guestName = `${firstName} ${lastName}`.trim();
 
-    // Availability Check
-    const available = await isRoomAvailable(roomName, ci2, co2);
-    if (!available) {
-        showAvailabilityAlert(`The ${roomName} is fully booked from ${ci2} to ${co2}. Please try another date or room type.`);
-        return;
-    }
-
     // Calculate total (matches price summary logic)
-    const { data: config, error: sErr } = await window.supabaseClient.from('settings').select('*').eq('id', 1).single();
-    if (sErr) {
-        alert('Booking failed: Could not load settings.');
-        return;
-    }
-
+    const config = JSON.parse(localStorage.getItem('dhv_config') || '{"taxRate":0}');
     const addonSel = document.getElementById('b-addons');
     const addonCost = parseInt(addonSel?.options[addonSel?.selectedIndex]?.dataset?.cost, 10) || 0;
     const subtotal = roomPrice * nights + addonCost;
     const total = subtotal;
 
-    // Save to Supabase
+    // Save to localStorage
     const booking = {
         ref, guest: guestName, email, phone,
         room: roomName, checkin: ci2, checkout: co2,
-        nights, amount: total, status: 'pending'
+        nights, amount: total, status: 'confirmed',
+        createdAt: new Date().toISOString()
     };
+    const existing = JSON.parse(localStorage.getItem('dhv_bookings') || '[]');
+    existing.unshift(booking);
+    localStorage.setItem('dhv_bookings', JSON.stringify(existing));
 
-    const { error: iErr } = await window.supabaseClient.from('bookings').insert(booking);
-    if (iErr) {
-        alert('Booking failed: ' + iErr.message);
-        return;
-    }
+    // Send email confirmation to the guest
+    sendConfirmationEmail({
+        ref,
+        guest_name: guestName,
+        email,
+        room: roomName,
+        checkin: ci2,
+        checkout: co2,
+        nights,
+        amount: '₱' + total.toLocaleString(),
+    });
 
-    document.getElementById('modalTitle').textContent = 'Booking Submitted!';
+    document.getElementById('bookingSummaryText').textContent =
+        `${guestName} · ${roomName} · ${nights} night${nights > 1 ? 's' : ''} (${ci2} → ${co2})`;
+
     document.getElementById('confirmModal').classList.add('active');
 }
 
 function closeModal() {
     document.getElementById('confirmModal').classList.remove('active');
     window.location.href = 'index.html';
-}
-
-function showAvailabilityAlert(msg) {
-    const modal = document.getElementById('alertModal');
-    const msgEl = document.getElementById('alertMessage');
-    if (modal && msgEl) {
-        msgEl.textContent = msg;
-        modal.classList.add('active');
-    }
-}
-
-function closeAlertModal() {
-    document.getElementById('alertModal').classList.remove('active');
-}
-
-/**
- * Opens Facebook for the guest to send their receipt
- */
-function sendToFB() {
-    // Navigate to Facebook (using a generic message link or the user's specific page if known)
-    const fbUrl = "https://www.facebook.com/";
-    window.open(fbUrl, '_blank');
-    closeModal();
 }
 
 // ----------------------------------------------------------
