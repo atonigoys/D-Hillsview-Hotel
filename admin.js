@@ -19,7 +19,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. INITIAL LOAD
     refreshDashboard();
+
+    // 2. REVENUE FILTER (Flatpickr Month Mode)
+    initRevenueFilter();
 });
+
+function initRevenueFilter() {
+    const periodLabel = document.getElementById('currentPeriod');
+    const labelWrap = document.getElementById('revenueDateLabel');
+
+    if (periodLabel && labelWrap) {
+        const picker = flatpickr("#revenueDate", {
+            disableMobile: "true",
+            static: true,
+            monthSelectorType: "static",
+            dateFormat: "F Y",
+            onReady: function (selectedDates, dateStr, instance) {
+                periodLabel.textContent = dateStr || "February 2026";
+            },
+            onChange: function (selectedDates, dateStr) {
+                periodLabel.textContent = dateStr;
+                refreshDashboard(selectedDates[0]);
+            }
+        });
+
+        labelWrap.addEventListener('click', () => picker.open());
+    }
+}
 
 // ----------------------------------------------------------
 // PAGE NAVIGATION
@@ -64,7 +90,7 @@ function signOut() {
 // ----------------------------------------------------------
 // DASHBOARD DATA REFRESH
 // ----------------------------------------------------------
-async function refreshDashboard() {
+async function refreshDashboard(targetDate = new Date()) {
     if (!window.supabaseClient) return;
 
     // Fetch Bookings
@@ -120,18 +146,18 @@ async function refreshDashboard() {
     }
 
     // 5. Render Charts
-    renderCharts(bookings);
+    renderCharts(bookings, targetDate);
 }
 
 // ----------------------------------------------------------
 // CHART RENDERING
 // ----------------------------------------------------------
-function renderCharts(bookings) {
-    // A. REVENUE CHART (Last 7 Months)
+function renderCharts(bookings, viewDate = new Date()) {
+    // A. REVENUE CHART (Last 7 Months from selection)
     const revenueEl = document.getElementById('revenueChart');
     if (revenueEl) {
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const now = new Date();
+        const now = viewDate;
         const last7 = [];
 
         // Prep 7 month slots

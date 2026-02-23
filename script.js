@@ -149,77 +149,68 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ----------------------------------------------------------
-    // 6. BOOKING BAR — Date Defaults (index.html)
+    // 6. BOOKING BAR — Flatpickr Integration (index.html)
     // ----------------------------------------------------------
-    const checkinEl = document.getElementById('checkin');
-    const checkoutEl = document.getElementById('checkout');
+    const fpConfig = {
+        minDate: "today",
+        altInput: true,
+        altFormat: "F j, Y",
+        dateFormat: "Y-m-d",
+        disableMobile: "true",
+        monthSelectorType: "static" // "Organized" month selection
+    };
 
-    if (checkinEl && checkoutEl) {
-        const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const dayAfter = new Date(today);
-        dayAfter.setDate(dayAfter.getDate() + 3);
-
-        checkinEl.value = formatDate(tomorrow);
-        checkoutEl.value = formatDate(dayAfter);
-        checkinEl.min = formatDate(today);
-        checkoutEl.min = formatDate(tomorrow);
-
-        checkinEl.addEventListener('change', () => {
-            const newMin = new Date(checkinEl.value);
-            newMin.setDate(newMin.getDate() + 1);
-            checkoutEl.min = formatDate(newMin);
-            if (new Date(checkoutEl.value) <= new Date(checkinEl.value)) {
-                checkoutEl.value = formatDate(newMin);
+    if (document.getElementById('checkin')) {
+        const ciPicker = flatpickr("#checkin", {
+            ...fpConfig,
+            defaultDate: new Date().fp_incr(1),
+            onChange: function (selectedDates, dateStr) {
+                coPicker.set("minDate", new Date(selectedDates[0]).fp_incr(1));
             }
+        });
+        const coPicker = flatpickr("#checkout", {
+            ...fpConfig,
+            defaultDate: new Date().fp_incr(3)
         });
     }
 
     // ----------------------------------------------------------
-    // 7. BOOKING FORM — Pre-fill from URL params (booking.html)
+    // 7. BOOKING FORM — Flatpickr Integration (booking.html)
     // ----------------------------------------------------------
-    const bookingRoom = document.getElementById('b-room');
-    if (bookingRoom) {
+    if (document.getElementById('b-checkin')) {
         const params = new URLSearchParams(window.location.search);
-        const roomParam = params.get('room');
-        const priceParam = params.get('price');
 
-        if (roomParam) {
-            [...bookingRoom.options].forEach(opt => {
-                if (opt.value === roomParam) opt.selected = true;
-            });
-        }
-
-        // Set today/tomorrow defaults for booking form dates
-        const bCheckin = document.getElementById('b-checkin');
-        const bCheckout = document.getElementById('b-checkout');
-        if (bCheckin && bCheckout) {
-            const today = new Date();
-            const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
-            const dayAfter = new Date(today); dayAfter.setDate(dayAfter.getDate() + 3);
-            bCheckin.value = formatDate(tomorrow);
-            bCheckout.value = formatDate(dayAfter);
-            bCheckin.min = formatDate(today);
-            bCheckout.min = formatDate(tomorrow);
-
-            bCheckin.addEventListener('change', () => {
-                const newMin = new Date(bCheckin.value);
-                newMin.setDate(newMin.getDate() + 1);
-                bCheckout.min = formatDate(newMin);
-                if (new Date(bCheckout.value) <= new Date(bCheckin.value)) {
-                    bCheckout.value = formatDate(newMin);
-                }
+        const bCiPicker = flatpickr("#b-checkin", {
+            ...fpConfig,
+            defaultDate: params.get('checkin') || new Date().fp_incr(1),
+            onChange: function (selectedDates, dateStr) {
+                bCoPicker.set("minDate", new Date(selectedDates[0]).fp_incr(1));
                 updatePriceSummary();
-            });
+            }
+        });
 
-            bCheckout.addEventListener('change', updatePriceSummary);
-        }
+        const bCoPicker = flatpickr("#b-checkout", {
+            ...fpConfig,
+            defaultDate: params.get('checkout') || new Date().fp_incr(3),
+            onChange: updatePriceSummary
+        });
 
-        bookingRoom.addEventListener('change', updatePriceSummary);
+        // Room & Addon Listeners
+        document.getElementById('b-room')?.addEventListener('change', updatePriceSummary);
         document.getElementById('b-addons')?.addEventListener('change', updatePriceSummary);
 
-        // Initial update
+        // Pre-fill room if in URL
+        const roomParam = params.get('room');
+        if (roomParam) {
+            const bookingRoom = document.getElementById('b-room');
+            if (bookingRoom) {
+                [...bookingRoom.options].forEach(opt => {
+                    if (opt.value === roomParam) opt.selected = true;
+                });
+            }
+        }
+
+        // Initial check
         updatePriceSummary();
     }
 

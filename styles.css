@@ -1034,6 +1034,98 @@ section {
   background: #1a1a2e;
 }
 
+/* ============================================================ 
+   FLATPICKR CUSTOM THEME: D'Hillsview Dark
+   ============================================================ */
+.flatpickr-calendar {
+  background: var(--bg-deep) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: var(--radius) !important;
+  font-family: 'Inter', sans-serif !important;
+  width: 315px !important;
+}
+
+.flatpickr-month {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  fill: var(--text-primary) !important;
+  height: 50px !important;
+}
+
+.flatpickr-current-month {
+  font-family: 'Playfair Display', serif !important;
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+}
+
+.flatpickr-current-month .cur-month {
+  font-weight: 700 !important;
+}
+
+.flatpickr-weekday {
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  font-weight: 600 !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.flatpickr-day {
+  color: var(--text-primary) !important;
+  border-radius: 8px !important;
+  transition: var(--transition) !important;
+}
+
+.flatpickr-day:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: transparent !important;
+}
+
+.flatpickr-day.today {
+  border-color: var(--gold) !important;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+  background: var(--gold) !important;
+  border-color: var(--gold) !important;
+  color: var(--bg-deep) !important;
+  font-weight: 700 !important;
+}
+
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.flatpickr-disabled:hover {
+  color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+  color: var(--gold) !important;
+  fill: var(--gold) !important;
+}
+
+.flatpickr-months .flatpickr-prev-month:hover,
+.flatpickr-months .flatpickr-next-month:hover {
+  color: var(--text-primary) !important;
+}
+
+/* Make it organized - Month/Year selection */
+.flatpickr-calendar.hasWeeks .flatpickr-month,
+.flatpickr-calendar.hasTime .flatpickr-month {
+  height: 60px !important;
+}
+
+.numInputWrapper span.arrowUp:after {
+  border-bottom-color: var(--gold) !important;
+}
+
+.numInputWrapper span.arrowDown:after {
+  border-top-color: var(--gold) !important;
+}
+
 /* Price Summary Panel */
 .price-panel {
   background: var(--bg-card);

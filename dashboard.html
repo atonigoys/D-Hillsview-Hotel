@@ -14,6 +14,9 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 
 <body>
@@ -135,7 +138,14 @@
                                 <div class="chart-title">Monthly Revenue</div>
                                 <div class="chart-sub">Last 7 months</div>
                             </div>
-                            <div style="font-size:0.78rem; color:var(--text-muted);">2026</div>
+                            <div class="chart-filter" title="Click to filter by Month">
+                                <input type="text" id="revenueDate" style="display:none;">
+                                <div id="revenueDateLabel"
+                                    style="cursor:pointer; font-size:0.8rem; font-weight:600; color:var(--gold); display:flex; align-items:center; gap:0.4rem;">
+                                    <span id="currentPeriod">February 2026</span>
+                                    <span>▾</span>
+                                </div>
+                            </div>
                         </div>
                         <div class="bar-chart" id="revenueChart"></div>
                     </div>
@@ -342,7 +352,11 @@
                     <div class="chart-header">
                         <div>
                             <div class="chart-title">Revenue Breakdown — 2026</div>
-                            <div class="chart-sub">Monthly bar chart</div>
+                            <div class="chart-sub">Annual performance report</div>
+                        </div>
+                        <div style="font-size:0.82rem; color:var(--gold); font-weight:600; cursor:pointer;"
+                            onclick="showToast('History export coming soon', 'info')">
+                            📊 Report ▾
                         </div>
                     </div>
                     <div class="bar-chart" id="revenueChart2"></div>
