@@ -39,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function applyDynamicPricing() {
         const config = await getPricing();
         const ratePlans = config.rate_plans || [];
+        console.log('📦 Config from Supabase:', JSON.stringify(config));
+        console.log('📋 Rate Plans found:', ratePlans.length, ratePlans);
 
         // 1. Update Room Cards (index.html / rooms.html)
         const roomCards = document.querySelectorAll('.room-card');
