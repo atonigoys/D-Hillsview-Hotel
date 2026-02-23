@@ -561,3 +561,65 @@ mobileStyle.textContent = `
   }
 `;
 document.head.appendChild(mobileStyle);
+
+// ----------------------------------------------------------
+// TERMS & CONDITIONS MODAL
+// ----------------------------------------------------------
+function initTermsModal() {
+    if (document.getElementById('termsModal')) return;
+
+    const modalHtml = `
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-card terms-modal-card">
+            <h2 style="margin-bottom:1.5rem;">Terms & Conditions</h2>
+            <div class="terms-scroll">
+                <ul class="terms-list">
+                    <li>The remaining balance must be paid upon check-in using Cash, GCash, or Bank Transfer.</li>
+                    <li>Cigarette smoking is not allowed inside the room.</li>
+                    <li>Prohibited drugs, combustible materials, deadly weapons and other items prohibited by the law are not allowed inside the building premises.</li>
+                    <li>The hotel is not liable for any loss of cash or valuables resulting from guest negligence. We recommend keeping your belongings secure at all times.</li>
+                    <li>Room key must be surrendered to the reception area upon leaving the guest room or upon check-out. The loss of key will be charged P1,000.</li>
+                    <li>Guests are discouraged from bringing cooked foods, beverages, liquor and items with unpleasant odors to their room.</li>
+                    <li>Cooking and ironing is strictly prohibited.</li>
+                    <li>Pets are not allowed inside the property.</li>
+                    <li>Parties and gatherings inside the guest room require clearance from the management.</li>
+                    <li>Check out time is 12:00NN. Check in time is 2:00PM. Excess hours of stay will be charged accordingly.</li>
+                    <li>Please inform the front desk if you are ready to check out so we can check the room before you leave.</li>
+                    <li>Please take care of the linens. Staining the towels, pillowcases, or bedsheets may result in a P1,000 charge.</li>
+                    <li>Laundry service is available upon request and must be arranged at least one day in advance.</li>
+                    <li>Guests will be charged for any damages or missing items from the property.</li>
+                    <li>Illegal activities are strictly prohibited. We also ask all guests to respect the privacy of others at all times.</li>
+                    <li>Please maintain a peaceful environment by avoiding any disturbances or nuisances on the premises.</li>
+                </ul>
+            </div>
+            <div class="terms-modal-footer">
+                <button class="btn-modal" onclick="closeTermsModal()">I Understand</button>
+            </div>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Close on overlay click
+    const modal = document.getElementById('termsModal');
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeTermsModal();
+    });
+}
+
+function showTermsModal(e) {
+    if (e) e.preventDefault();
+    initTermsModal();
+    const modal = document.getElementById('termsModal');
+    if (modal) modal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent background scroll
+}
+
+function closeTermsModal() {
+    const modal = document.getElementById('termsModal');
+    if (modal) modal.classList.remove('active');
+    document.body.style.overflow = ''; // Restore scroll
+}
+
+// Export to global scope
+window.showTermsModal = showTermsModal;
+window.closeTermsModal = closeTermsModal;
