@@ -19,7 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Helper: get best active discount for a room type from plans array
     function getBestDiscount(roomType, plans) {
         if (!plans || !plans.length) return { discount: 0, planName: '' };
-        const today = new Date().toISOString().split('T')[0];
+        const now = new Date();
+        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
         let bestDiscount = 0;
         let bestPlanName = '';
@@ -39,8 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function applyDynamicPricing() {
         const config = await getPricing();
         const ratePlans = config.rate_plans || [];
-        console.log('📦 Config from Supabase:', JSON.stringify(config));
-        console.log('📋 Rate Plans found:', ratePlans.length, ratePlans);
+
 
         // 1. Update Room Cards (index.html / rooms.html)
         const roomCards = document.querySelectorAll('.room-card');
