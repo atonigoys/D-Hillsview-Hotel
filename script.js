@@ -266,7 +266,6 @@ function updatePriceSummary() {
     const addonCost = parseInt(addonOpt?.dataset.cost, 10) || 0;
     const addonName = addonOpt?.value !== 'none' ? addonOpt?.text.split(' —')[0] : null;
 
-    const config = JSON.parse(localStorage.getItem('dhv_config') || '{"taxRate":0}');
     const subtotal = roomPrice * nights + addonCost;
     const total = subtotal;
 
@@ -348,14 +347,39 @@ function handleHeroSearch() {
 // ----------------------------------------------------------
 // BOOKING FORM VALIDATION + SUBMIT
 // ----------------------------------------------------------
-function handleBookingSubmit() {
+async function checkRoomAvailability(roomType, checkin, checkout) {
+    if (!window.supabaseClient) return true; // Safety fallback
+
+    // 1. Get Room Inventory Limit
+    const { data: config } = await window.supabaseClient.from('settings').select('inventory').eq('id', 1).single();
+    const typeKey = roomType.toLowerCase().includes('single') ? 'single' :
+        roomType.toLowerCase().includes('deluxe') ? 'deluxe' : 'family';
+    const totalRooms = config?.inventory?.[typeKey] || 10;
+
+    // 2. Count overlapping bookings in Supabase
+    // A booking overlaps if: (startA < endB) AND (endA > startB)
+    const { data: overlaps, error } = await window.supabaseClient
+        .from('bookings')
+        .select('id')
+        .eq('room', roomType)
+        .lt('checkin', checkout)
+        .gt('checkout', checkin);
+
+    if (error) {
+        console.error('Availability check failed:', error);
+        return false;
+    }
+
+    return (overlaps.length < totalRooms);
+}
+
+async function handleBookingSubmit() {
     let valid = true;
 
     function validateField(groupId, inputId, condition, errMsg) {
         const group = document.getElementById(groupId);
         const input = document.getElementById(inputId);
         if (!group || !input) return;
-        const errEl = group.querySelector('.error-msg');
         if (!condition(input.value)) {
             group.classList.add('has-error');
             if (input) input.classList.add('error');
@@ -383,13 +407,31 @@ function handleBookingSubmit() {
         return;
     }
 
+    const roomSel = document.getElementById('b-room');
+    const roomOpt = roomSel?.options[roomSel.selectedIndex];
+    const roomName = roomOpt?.value || 'Selected Room';
+
+    // --- REAL-TIME AVAILABILITY CHECK ---
+    const submitBtn = document.querySelector('.btn-confirm');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Checking Availability...';
+    }
+
+    const isAvailable = await checkRoomAvailability(roomName, ci, co);
+    if (!isAvailable) {
+        alert(`Sorry, the ${roomName} is fully booked for those dates. Please try different dates or another room type.`);
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Confirm Booking →';
+        }
+        return;
+    }
+
     // Success — collect booking details
     const ref = 'DHV-' + Math.random().toString(36).substring(2, 8).toUpperCase();
     document.getElementById('bookingRef').textContent = `Ref: #${ref}`;
 
-    const roomSel = document.getElementById('b-room');
-    const roomOpt = roomSel?.options[roomSel.selectedIndex];
-    const roomName = roomOpt?.value || 'Selected Room';
     const roomPrice = parseInt(roomOpt?.dataset.price, 10) || 0;
     const nights = getNights();
     const ci2 = document.getElementById('b-checkin')?.value;
@@ -401,24 +443,29 @@ function handleBookingSubmit() {
     const guestName = `${firstName} ${lastName}`.trim();
 
     // Calculate total (matches price summary logic)
-    const config = JSON.parse(localStorage.getItem('dhv_config') || '{"taxRate":0}');
     const addonSel = document.getElementById('b-addons');
     const addonCost = parseInt(addonSel?.options[addonSel?.selectedIndex]?.dataset?.cost, 10) || 0;
     const subtotal = roomPrice * nights + addonCost;
     const total = subtotal;
 
-    // Save to localStorage
+    // Save to Supabase
     const booking = {
         ref, guest: guestName, email, phone,
         room: roomName, checkin: ci2, checkout: co2,
-        nights, amount: total, status: 'confirmed',
-        createdAt: new Date().toISOString()
+        nights, amount: total, status: 'pending'
     };
-    const existing = JSON.parse(localStorage.getItem('dhv_bookings') || '[]');
-    existing.unshift(booking);
-    localStorage.setItem('dhv_bookings', JSON.stringify(existing));
 
-    // Send email confirmation to the guest
+    const { error: iErr } = await window.supabaseClient.from('bookings').insert(booking);
+    if (iErr) {
+        alert('Booking failed: ' + iErr.message);
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Confirm Booking →';
+        }
+        return;
+    }
+
+    // Send email confirmation
     sendConfirmationEmail({
         ref,
         guest_name: guestName,
