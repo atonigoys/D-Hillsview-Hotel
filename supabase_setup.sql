@@ -36,6 +36,14 @@ BEGIN
     END IF;
 END $$;
 
+-- 5. Add room_statuses column (housekeeping & maintenance tracking)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='settings' AND column_name='room_statuses') THEN
+        ALTER TABLE public.settings ADD COLUMN room_statuses jsonb NOT NULL DEFAULT '{}'::jsonb;
+    END IF;
+END $$;
+
 -- 1. Ensure the 'guest' column exists (in case it was missed)
 DO $$ 
 BEGIN

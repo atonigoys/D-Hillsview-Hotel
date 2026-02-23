@@ -1741,6 +1741,40 @@ img {
     outline-offset: -1px;
 }
 
+/* Room Status Indicators */
+.tc-room-status {
+    cursor: pointer;
+    font-size: 0.55rem;
+    transition: transform 0.2s ease;
+    display: inline-block;
+}
+
+.tc-room-status:hover {
+    transform: scale(1.4);
+}
+
+/* Maintenance Row */
+.tc-maintenance .tc-room-label {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.tc-maintenance .tc-room-cell {
+    background: repeating-linear-gradient(-45deg,
+            transparent,
+            transparent 4px,
+            rgba(255, 255, 255, 0.02) 4px,
+            rgba(255, 255, 255, 0.02) 8px);
+    opacity: 0.5;
+}
+
+.tc-maintenance .tc-room-cell.tc-today {
+    background: repeating-linear-gradient(-45deg,
+            rgba(212, 168, 71, 0.03),
+            rgba(212, 168, 71, 0.03) 4px,
+            rgba(255, 255, 255, 0.02) 4px,
+            rgba(255, 255, 255, 0.02) 8px);
+}
+
 /* Responsive adjustments for rates page */
 @media (max-width: 1024px) {
     .rates-stats-row {

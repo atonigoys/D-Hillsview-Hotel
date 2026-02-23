@@ -866,6 +866,7 @@ async function renderAvailMatrix(startDate) {
         inventory: { single: 10, deluxe: 10, family: 10 },
         prices: { single: 180, deluxe: 320, family: 420 }
     };
+    const roomStatuses = config.room_statuses || {}; // { "101": "clean", "102": "dirty", ... }
 
     const roomTypes = [
         { id: 'single', name: 'Single Room', prefix: 1 },
@@ -947,8 +948,11 @@ async function renderAvailMatrix(startDate) {
         // ── INDIVIDUAL ROOM ROWS ──
         for (let r = 1; r <= inv; r++) {
             const roomNum = rt.prefix * 100 + r;
-            html += `<div class="tc-room-row">`;
-            html += `<div class="tc-room-label">Room ${roomNum}</div>`;
+            const rStatus = roomStatuses[roomNum] || 'clean';
+            const statusIcon = rStatus === 'maintenance' ? '🔴' : rStatus === 'dirty' ? '🟡' : '🟢';
+            const statusTitle = rStatus === 'maintenance' ? 'Maintenance' : rStatus === 'dirty' ? 'Dirty' : 'Clean';
+            html += `<div class="tc-room-row${rStatus === 'maintenance' ? ' tc-maintenance' : ''}">`;
+            html += `<div class="tc-room-label"><span class="tc-room-status" data-room="${roomNum}" title="${statusTitle} — Click to change">${statusIcon}</span> Room ${roomNum}</div>`;
 
             const roomSlotBookings = typeBookings.filter(b => getSlotForBooking(b, r));
 
@@ -1003,6 +1007,11 @@ async function renderAvailMatrix(startDate) {
 
     // ── ATTACH DRAG-AND-DROP LISTENERS ──
     attachTapeChartDragDrop(chart);
+
+    // ── ATTACH ROOM STATUS CLICK HANDLERS ──
+    chart.querySelectorAll('.tc-room-status').forEach(icon => {
+        icon.addEventListener('click', () => cycleRoomStatus(icon.dataset.room));
+    });
 }
 
 // ── DRAG-AND-DROP ENGINE ──
@@ -1069,6 +1078,31 @@ function attachTapeChartDragDrop(chart) {
             }
         });
     });
+}
+
+// ── ROOM STATUS CYCLING ──
+// Statuses: clean → dirty → maintenance → clean
+async function cycleRoomStatus(roomNum) {
+    // Fetch current statuses
+    const { data } = await window.supabaseClient.from('settings').select('room_statuses').eq('id', 1).single();
+    const statuses = (data && data.room_statuses) || {};
+
+    const current = statuses[roomNum] || 'clean';
+    const next = current === 'clean' ? 'dirty' : current === 'dirty' ? 'maintenance' : 'clean';
+    statuses[roomNum] = next;
+
+    // Save to Supabase
+    const { error } = await window.supabaseClient.from('settings').update({ room_statuses: statuses }).eq('id', 1);
+    if (error) {
+        showToast('Failed to update room status', 'error');
+        return;
+    }
+
+    const labels = { clean: '🟢 Clean', dirty: '🟡 Dirty', maintenance: '🔴 Maintenance' };
+    showToast(`Room ${roomNum}: ${labels[next]}`, 'info');
+
+    // Re-render
+    renderAvailMatrix(matrixStartDate);
 }
 
 function navigateMatrix(days) {

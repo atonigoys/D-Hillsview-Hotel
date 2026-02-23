@@ -427,15 +427,18 @@
                     </div>
 
                     <!-- Legend -->
-                    <div class="avail-legend">
+                    <div class="avail-legend" style="flex-wrap:wrap;">
                         <div class="avail-legend-item"><span class="avail-dot" style="background:#2ecc71;"></span>
                             Confirmed</div>
                         <div class="avail-legend-item"><span class="avail-dot" style="background:var(--gold);"></span>
                             Pending</div>
                         <div class="avail-legend-item"><span class="avail-dot" style="background:#3498db;"></span>
                             Checked-in</div>
-                        <div class="avail-legend-item"><span class="avail-dot"
-                                style="background:var(--text-muted);"></span> Available</div>
+                        <div class="avail-legend-item"
+                            style="margin-left:1rem; padding-left:1rem; border-left:1px solid var(--border-light);">
+                            🟢 Clean</div>
+                        <div class="avail-legend-item">🟡 Dirty</div>
+                        <div class="avail-legend-item">🔴 Maintenance</div>
                     </div>
 
                     <!-- Tape Chart -->
