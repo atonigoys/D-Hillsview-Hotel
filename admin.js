@@ -1094,7 +1094,8 @@ async function cycleRoomStatus(roomNum) {
     // Save to Supabase
     const { error } = await window.supabaseClient.from('settings').update({ room_statuses: statuses }).eq('id', 1);
     if (error) {
-        showToast('Failed to update room status', 'error');
+        console.error('Supabase Error updating room status:', error);
+        showToast('Failed to update room status. Check console for details.', 'error');
         return;
     }
 
