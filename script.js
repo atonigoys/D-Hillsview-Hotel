@@ -354,7 +354,8 @@ async function checkRoomAvailability(roomType, checkin, checkout) {
     const { data: config } = await window.supabaseClient.from('settings').select('inventory').eq('id', 1).single();
     const typeKey = roomType.toLowerCase().includes('single') ? 'single' :
         roomType.toLowerCase().includes('deluxe') ? 'deluxe' : 'family';
-    const totalRooms = config?.inventory?.[typeKey] || 10;
+    const invValue = config?.inventory?.[typeKey];
+    const totalRooms = (invValue !== undefined && invValue !== null) ? invValue : 10;
 
     // 2. Count overlapping bookings in Supabase
     // A booking overlaps if: (startA < endB) AND (endA > startB)
