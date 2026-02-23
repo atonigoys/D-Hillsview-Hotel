@@ -405,15 +405,22 @@ async function savePricing() {
         return;
     }
 
-    const { error } = await window.supabaseClient
-        .from('settings')
-        .update({
-            prices: { single, deluxe, family }
-        })
-        .eq('id', 1);
+    try {
+        const { error } = await window.supabaseClient
+            .from('settings')
+            .update({
+                prices: { single, deluxe, family }
+            })
+            .eq('id', 1);
 
-    if (error) {
-        alert('Save failed: ' + error.message);
+        if (error) {
+            console.error('Supabase Save Error:', error);
+            alert('Save failed: ' + (error.message || 'Unknown error. Check console.'));
+            return;
+        }
+    } catch (err) {
+        console.error('Network/Fetch Error:', err);
+        alert('Save failed: ' + err.message + '\n\nPossible causes:\n1. Supabase URL/Key is incorrect.\n2. Table "settings" doesn\'t exist (did you run the SQL?).\n3. CORS is blocking the request.');
         return;
     }
 

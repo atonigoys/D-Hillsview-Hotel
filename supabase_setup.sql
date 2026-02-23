@@ -28,6 +28,10 @@ INSERT INTO public.settings (id, prices, inventory, tax_rate)
 VALUES (1, '{"single": 180, "deluxe": 320, "family": 420}', '{"single": 10, "deluxe": 10, "family": 10}', 0)
 ON CONFLICT (id) DO NOTHING;
 
--- 4. Enable Realtime (Optional but recommended for cross-device sync)
+-- 4. Disable RLS for public access (Simplified for this setup)
+ALTER TABLE public.bookings DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.settings DISABLE ROW LEVEL SECURITY;
+
+-- 5. Enable Realtime
 ALTER PUBLICATION supabase_realtime ADD TABLE bookings;
 ALTER PUBLICATION supabase_realtime ADD TABLE settings;
