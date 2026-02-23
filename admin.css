@@ -845,8 +845,8 @@ img {
 /* Rooms Grid (Admin) */
 .admin-rooms-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 2.5rem;
 }
 
 .admin-room-card {
@@ -863,7 +863,7 @@ img {
 }
 
 .admin-room-img {
-    height: 160px;
+    height: 220px;
     overflow: hidden;
     position: relative;
 }

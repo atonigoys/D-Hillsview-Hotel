@@ -347,14 +347,15 @@ async function renderRoomsGrid() {
                     Base Price: ₱${config.prices[r.id]} / night
                 </div>
                 
-                <div style="background:rgba(255,255,255,0.035); padding:1.25rem 1rem; border-radius:10px; border:1px solid var(--border-light);">
-                    <label style="display:block; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:0.75rem;">
-                        How many rooms available
+                <div style="background:rgba(255,255,255,0.03); padding:1.5rem 1.25rem; border-radius:12px; border:1px solid var(--border-light); transition:var(--transition);" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
+                    <label style="display:block; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); margin-bottom:0.85rem; font-weight:600;">
+                        Inventory Count
                     </label>
-                    <div style="display:flex; gap:0.75rem;">
+                    <div style="display:flex; gap:1rem; align-items:center;">
                         <input type="number" id="inv-${r.id}" value="${config.inventory[r.id]}" 
-                               style="flex:1; background:var(--bg-card); border:1px solid var(--border); color:var(--text-primary); padding:0.5rem; border-radius:6px; font-weight:600; font-size:1rem;">
-                        <button class="topbar-btn primary" style="padding:0.5rem 1rem; min-width:90px; justify-content:center;" onclick="updateInventory('${r.id}')">Record</button>
+                               style="width:100px; background:var(--bg-deep); border:1px solid var(--border); color:var(--gold); padding:0.6rem; border-radius:8px; font-weight:700; font-size:1.1rem; text-align:center;">
+                        <span style="font-size:0.85rem; color:var(--text-muted); flex:1;">Rooms available</span>
+                        <button class="topbar-btn primary" style="padding:0.6rem 1.25rem; min-width:100px; justify-content:center; box-shadow:0 4px 12px rgba(201,169,110,0.2);" onclick="updateInventory('${r.id}')">Record</button>
                     </div>
                 </div>
             </div>
