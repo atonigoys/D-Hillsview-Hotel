@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hotel Policies — D'HILLSVIEW HOTEL</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-text">D'HILLSVIEW <span>HOTEL</span></div>
+                <div class="logo-sub">Experience Luxury</div>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="rooms.html">Rooms</a>
+                <a href="index.html#services">Services</a>
+                <a href="index.html#contact">Contact</a>
+                <a href="booking.html" class="btn-primary">Book Now</a>
+            </div>
+            <button class="nav-toggle" id="navToggle">☰</button>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero-sub"
+        style="height: 40vh; min-height: 300px; display: flex; align-items: center; justify-content: center; text-align: center; background: linear-gradient(rgba(6, 6, 13, 0.7), rgba(6, 6, 13, 0.7)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center;">
+        <div class="container" style="animation: fadeInUp 1s ease;">
+            <h1 style="font-size: 3.5rem; margin-bottom: 0.5rem;">Policies</h1>
+            <p style="color: var(--gold); letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500;">Property
+                and Cancellation Policies</p>
+        </div>
+    </section>
+
+    <!-- CONTENT SECTION -->
+    <section class="section" style="padding: 5rem 0; background: var(--bg-deep);">
+        <div class="container" style="max-width: 800px;">
+            <div
+                style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 3rem; box-shadow: 0 30px 60px rgba(0,0,0,0.5);">
+
+                <div style="margin-bottom: 3rem;">
+                    <h2
+                        style="color: var(--gold); font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                        1. STANDARD CANCELLATION POLICY</h2>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>To confirm your booking, we require a 100% deposit. You may conveniently pay via GCash
+                                or bank transfer.</span>
+                        </li>
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>Credit card payments are temporarily unavailable.</span>
+                        </li>
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>If you cancel within 10 days of your arrival, the deposit is non-refundable.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 3rem;">
+                    <h2
+                        style="color: var(--gold); font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                        2. NO - SHOW POLICY</h2>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>Failure to arrive on the scheduled arrival date without prior cancellation will be
+                                treated as a no-show.</span>
+                        </li>
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>No-shows will be charged 100% of the total reservation, and the reservation will be
+                                cancelled for remaining nights.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 3rem;">
+                    <h2
+                        style="color: var(--gold); font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                        3. Non-Refundable Reservations</h2>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>All non-refundable rates, promotional rates, and advance purchase bookings are
+                                non-cancellable and non-refundable under any circumstances.</span>
+                        </li>
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>Full payment is required at the time of booking.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 3rem;">
+                    <h2
+                        style="color: var(--gold); font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                        4. Early Check-in</h2>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>Early check-in is subject to room availability.</span>
+                        </li>
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>Guests who arrive before the standard check-in time of 12:00 PM may request an early
+                                check-in. An early check-in fee of ₱100 per hour will be charged, counted from the time
+                                of arrival until 12:00 PM.</span>
+                        </li>
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>This fee applies only if the room is available and ready for occupancy. The hotel
+                                reserves the right to deny early check-in requests during peak periods or when rooms are
+                                unavailable.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 3rem;">
+                    <h2
+                        style="color: var(--gold); font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                        5. Early Departure</h2>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>Guests who depart earlier than the confirmed departure date will be charged for the
+                                entire reserved stay.</span>
+                        </li>
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>No refunds will be issued for unused nights.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 3rem;">
+                    <h2
+                        style="color: var(--gold); font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                        6. Modifications</h2>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>Changes to arrival dates, departure dates, or room types are subject to availability
+                                and may result in rate changes or additional charges.</span>
+                        </li>
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>Modifications made within the cancellation window are treated as cancellations.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 3rem;">
+                    <h2
+                        style="color: var(--gold); font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                        7. Dispute & Chargebacks</h2>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>By confirming a reservation, the guest agrees to this cancellation policy.</span>
+                        </li>
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>This policy may be used as documentation in the event of chargeback disputes.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 0;">
+                    <h2
+                        style="color: var(--gold); font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                        8. Policy Acknowledgment</h2>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>Booking confirmation constitutes full acceptance of this cancellation policy.</span>
+                        </li>
+                        <li style="margin-bottom: 0.8rem; display: flex; gap: 0.8rem;">
+                            <span style="color: var(--gold);">•</span>
+                            <span>The hotel reserves the right to amend this policy at any time without prior
+                                notice.</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <div class="logo-text">D'HILLSVIEW <span>HOTEL</span></div>
+                <p style="margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">Elevating your stay with
+                    unparalleled luxury and breathtaking views. Experience the hills like never before.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="rooms.html">Our Rooms</a></li>
+                    <li><a href="index.html#services">Services</a></li>
+                    <li><a href="booking.html">Make a Reservation</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Hotel</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="policies.html">Policies</a></li>
+                    <li><a href="#">Spa & Wellness</a></li>
+                    <li><a href="#">Events</a></li>
+                </ul>
+            </div>
+            <div class="footer-col footer-contact">
+                <h4>Contact</h4>
+                <p>📍 1 Grand Promenade, Marina Bay</p>
+                <p>📞 +1 (800) 555-LUXE</p>
+                <p>✉️ stay@hotelluxe.com</p>
+                <p>🕐 Check-in: 3PM | Out: 12PM</p>
+            </div>
+        </div>
+        <div class="container">
+            <div class="footer-bottom">
+                <span>&copy; 2026 D'HILLSVIEW HOTEL. All Rights Reserved.</span>
+                <a href="admin-login.html"
+                    style="font-size:0.75rem;color:var(--text-muted);text-decoration:none;margin-left:auto;opacity:0.6;transition:opacity 0.2s;"
+                    onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">🔐 Admin</a>
+                <div class="social-links">
+                    <div class="social-link" title="Instagram">📸</div>
+                    <div class="social-link" title="Facebook">📘</div>
+                    <div class="social-link" title="Twitter">🐦</div>
+                    <div class="social-link" title="YouTube">▶️</div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
