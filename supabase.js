@@ -1,3 +1,4 @@
+// VERSION: 1.0.1 (Supabase Migration Fix)
 // Supabase Configuration
 // Replace with your actual values from Supabase Project Settings > API
 const SUPABASE_URL = 'https://rzeppouvcbrntiegfdask.supabase.co';
@@ -7,4 +8,12 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-window.supabaseClient = supabaseClient; 
+window.supabaseClient = supabaseClient;
+
+// Initial Connection Check
+supabaseClient.from('settings').select('id').limit(1)
+    .then(({ error }) => {
+        if (error) console.error('Supabase Connection Test Failed:', error.message);
+        else console.log('✅ Supabase Connected Successfully');
+    })
+    .catch(err => console.error('Supabase Connection Error:', err));
