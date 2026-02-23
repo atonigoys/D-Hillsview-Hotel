@@ -343,6 +343,14 @@ section {
   filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
 }
 
+.hero h1 {
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  line-height: 1.1;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
 .hero h1 em {
   font-style: italic;
   color: var(--gold);
