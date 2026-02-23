@@ -261,7 +261,8 @@ section {
 .hero-content {
   position: relative;
   z-index: 2;
-  max-width: 700px;
+  max-width: 1200px;
+  width: 100%;
 }
 
 .hero-badge {
@@ -379,11 +380,9 @@ section {
 /* ============================================
    BOOKING BAR
    ============================================ */
-.booking-bar-wrap {
-  position: relative;
-  z-index: 3;
-  margin-top: -56px;
-  padding: 0 2rem;
+.hero-booking-wrap {
+  margin-top: 2.5rem;
+  width: 100%;
 }
 
 .booking-bar {

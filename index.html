@@ -39,59 +39,50 @@
         <div class="container">
             <div class="hero-content">
                 <h1>D'HILLSVIEW <em>HOTEL</em><br>& RESTAURANT</h1>
-                <div class="hero-actions">
-                    <a href="rooms.html" class="btn-primary">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2.5">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                        </svg>
-                        Explore Rooms
-                    </a>
-                    <a href="booking.html" class="btn-outline">Book Now</a>
+
+                <div class="hero-booking-wrap">
+                    <div class="booking-bar">
+                        <div class="booking-field">
+                            <label for="checkin">Check-In</label>
+                            <input type="date" id="checkin" name="checkin" />
+                        </div>
+                        <div class="booking-field">
+                            <label for="checkout">Check-Out</label>
+                            <input type="date" id="checkout" name="checkout" />
+                        </div>
+                        <div class="booking-field">
+                            <label for="guests">Guests</label>
+                            <select id="guests" name="guests">
+                                <option value="1">1 Guest</option>
+                                <option value="2" selected>2 Guests</option>
+                                <option value="3">3 Guests</option>
+                                <option value="4">4 Guests</option>
+                                <option value="5">5+ Guests</option>
+                            </select>
+                        </div>
+                        <div class="booking-field">
+                            <label for="room-type">Room Type</label>
+                            <select id="room-type" name="room-type">
+                                <option value="">Any Type</option>
+                                <option value="single">Single Room</option>
+                                <option value="deluxe">Deluxe Room</option>
+                                <option value="family">Family Room</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary" onclick="handleHeroSearch()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <circle cx="11" cy="11" r="8" />
+                                <path d="m21 21-4.35-4.35" />
+                            </svg>
+                            Search
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- BOOKING BAR -->
-    <div class="booking-bar-wrap">
-        <div class="booking-bar">
-            <div class="booking-field">
-                <label for="checkin">Check-In</label>
-                <input type="date" id="checkin" name="checkin" />
-            </div>
-            <div class="booking-field">
-                <label for="checkout">Check-Out</label>
-                <input type="date" id="checkout" name="checkout" />
-            </div>
-            <div class="booking-field">
-                <label for="guests">Guests</label>
-                <select id="guests" name="guests">
-                    <option value="1">1 Guest</option>
-                    <option value="2" selected>2 Guests</option>
-                    <option value="3">3 Guests</option>
-                    <option value="4">4 Guests</option>
-                    <option value="5">5+ Guests</option>
-                </select>
-            </div>
-            <div class="booking-field">
-                <label for="room-type">Room Type</label>
-                <select id="room-type" name="room-type">
-                    <option value="">Any Type</option>
-                    <option value="single">Single Room</option>
-                    <option value="deluxe">Deluxe Room</option>
-                    <option value="family">Family Room</option>
-                </select>
-            </div>
-            <button class="btn-primary" onclick="handleHeroSearch()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="m21 21-4.35-4.35" />
-                </svg>
-                Search
-            </button>
-        </div>
-    </div>
 
 
     <!-- FEATURED ROOMS -->
