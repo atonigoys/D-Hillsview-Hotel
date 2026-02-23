@@ -522,7 +522,7 @@ function sendConfirmationEmail(data) {
         checkout: data.checkout,
         nights: data.nights,
         amount: data.amount,
-        hotel_name: "D'HILLSVIEW HOTEL",
+        hotel_name: "D'HILLSVIEW HOTEL & RESTAURANT",
     }).then(() => {
         console.log('✅ Confirmation email sent to', data.email);
     }).catch(err => {
