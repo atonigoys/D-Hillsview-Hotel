@@ -22,7 +22,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. REVENUE FILTER (Flatpickr Month Mode)
     initRevenueFilter();
+
+    // 3. RBAC - Apply Permissions
+    applyPermissions();
 });
+
+function applyPermissions() {
+    const role = sessionStorage.getItem('dhv_role');
+    if (!role) return;
+
+    if (role === 'booking') {
+        console.log('🛡️ Applying Booking Staff restrictions...');
+
+        // Hide Restricted Sidebar items
+        const restrictedPages = ['overview', 'rooms', 'guests', 'settings'];
+        restrictedPages.forEach(p => {
+            const item = document.querySelector(`.nav-item[data-page="${p}"]`);
+            if (item) item.style.display = 'none';
+        });
+
+        // Hide "Main" and "System" labels to keep it clean
+        document.querySelectorAll('.nav-section-label').forEach(label => label.style.display = 'none');
+
+        // Update User Profile
+        const userName = document.querySelector('.user-name');
+        const userRole = document.querySelector('.user-role');
+        const userAvatar = document.querySelector('.user-avatar');
+
+        if (userName) userName.textContent = 'Booking Staff';
+        if (userRole) userRole.textContent = 'Staff Access';
+        if (userAvatar) {
+            userAvatar.textContent = 'B';
+            userAvatar.style.background = 'var(--blue)';
+        }
+
+        // Hide Topbar Actions (Revenue-related or New Booking if restricted)
+        // Let's keep +New Booking since it's Booking Staff
+
+        // Force switch to Bookings page as default
+        const bookingTab = document.querySelector('.nav-item[data-page="bookings"]');
+        if (bookingTab) switchPage(bookingTab, 'bookings');
+    }
+}
 
 function initRevenueFilter() {
     const periodLabel = document.getElementById('currentPeriod');

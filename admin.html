@@ -40,10 +40,14 @@
     </div>
 
     <script>
-        // Redirect if already logged in
         if (sessionStorage.getItem('dhv_admin') === 'true') {
             window.location.href = 'dashboard';
         }
+
+        const CREDENTIALS = {
+            'admin': { pass: 'admin123', role: 'admin' },
+            'booking': { pass: 'booking123', role: 'booking' }
+        };
 
         function handleLogin(e) {
             e.preventDefault();
@@ -51,8 +55,11 @@
             const pass = document.getElementById('password').value;
             const err = document.getElementById('loginError');
 
-            if (user === 'admin' && pass === 'admin123') {
+            const creds = CREDENTIALS[user];
+
+            if (creds && creds.pass === pass) {
                 sessionStorage.setItem('dhv_admin', 'true');
+                sessionStorage.setItem('dhv_role', creds.role);
                 window.location.href = 'dashboard';
             } else {
                 err.classList.add('show');
