@@ -403,9 +403,14 @@ function filterTable(query, tableId) {
 // PRICING MANAGEMENT
 // ----------------------------------------------------------
 async function savePricing() {
-    const single = parseInt(document.getElementById('price-single').textContent, 10);
-    const deluxe = parseInt(document.getElementById('price-deluxe').textContent, 10);
-    const family = parseInt(document.getElementById('price-family').textContent, 10);
+    const parsePrice = (id) => {
+        const val = document.getElementById(id).textContent.replace(/[^\d]/g, '');
+        return parseInt(val, 10);
+    };
+
+    const single = parsePrice('price-single');
+    const deluxe = parsePrice('price-deluxe');
+    const family = parsePrice('price-family');
 
     if (isNaN(single) || isNaN(deluxe) || isNaN(family)) {
         alert('Please enter valid numeric prices.');
