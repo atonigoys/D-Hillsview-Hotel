@@ -845,7 +845,7 @@ async function renderRatePlans() {
 // ----------------------------------------------------------
 // AVAILABILITY MATRIX — TAPE CHART
 // ----------------------------------------------------------
-const TAPE_DAYS = 14;
+const TAPE_DAYS = 30;
 
 // Track manual room assignments: { bookingId: roomSlotNumber }
 const roomAssignments = {};
