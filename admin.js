@@ -1252,19 +1252,29 @@ async function renderAvailMatrix(startDate) {
         });
     });
 
+    // ── SCROLLBAR SYNC REBORN ──
     const wrap = document.getElementById('tapeChartWrap');
     const bottomScroll = document.getElementById('bottomScrollContainer');
     const bottomScrollInner = document.getElementById('bottomScrollInner');
 
     if (wrap && bottomScroll && bottomScrollInner) {
+        console.log('🔄 Initializing Scroll Sync Engine...');
         let isSyncing = false;
 
-        const updateWidth = () => {
-            bottomScrollInner.style.width = chart.scrollWidth + 'px';
+        const syncWidth = () => {
+            const chartArea = document.getElementById('tapeChart');
+            if (chartArea) {
+                const newWidth = chartArea.scrollWidth;
+                bottomScrollInner.style.width = newWidth + 'px';
+                console.log(`📏 Syncing Scrollbar Width: ${newWidth}px`);
+            }
         };
 
-        updateWidth();
-        setTimeout(updateWidth, 300); // Wait for potential late rendering
+        // Aggressive width syncing
+        syncWidth();
+        setTimeout(syncWidth, 500);
+        setTimeout(syncWidth, 2000); // Late safety catch
+        window.addEventListener('resize', syncWidth);
 
         wrap.onscroll = () => {
             if (!isSyncing) {
@@ -1281,6 +1291,8 @@ async function renderAvailMatrix(startDate) {
                 requestAnimationFrame(() => isSyncing = false);
             }
         };
+    } else {
+        console.warn('⚠️ Scroll sync targets missing:', { wrap: !!wrap, bottomScroll: !!bottomScroll, bottomScrollInner: !!bottomScrollInner });
     }
 }
 
