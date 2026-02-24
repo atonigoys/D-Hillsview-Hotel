@@ -1567,33 +1567,38 @@ img {
 
 .tape-chart-wrap {
     overflow-x: auto;
-    overflow-y: auto;
-    max-height: calc(100vh - 260px);
     border-radius: var(--radius);
     border: 1px solid var(--border-light);
     background: var(--bg-card);
-    position: relative;
+
+    /* Permanent Scrollbar Styling */
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold) transparent;
 }
 
-/* Custom Prominent Scrollbar for Tape Chart */
+/* Chrome, Edge, Safari */
 .tape-chart-wrap::-webkit-scrollbar {
-    height: 12px;
-    width: 8px;
+    height: 8px;
+    /* Height for horizontal scrollbar */
+    display: block;
+    /* Ensure it stays visible */
 }
 
 .tape-chart-wrap::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 0 0 var(--radius) var(--radius);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
 }
 
 .tape-chart-wrap::-webkit-scrollbar-thumb {
     background: var(--gold);
     border-radius: 10px;
-    border: 2px solid #0a0a12;
+    border: 2px solid var(--bg-card);
+    /* Add padding effect */
 }
 
 .tape-chart-wrap::-webkit-scrollbar-thumb:hover {
-    background: #fff;
+    background: #e5c07b;
+    /* Lighter gold on hover */
 }
 
 /* New Matrix Sidebar Layout */
@@ -1601,29 +1606,21 @@ img {
     display: flex;
     gap: 1.5rem;
     align-items: flex-start;
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto;
 }
 
 .matrix-main {
     flex: 1;
     min-width: 0;
-    /* Critical for horizontal scroll sibling */
-    overflow: hidden;
-    /* Prevent wide chart from breaking flex */
+    /* Important for horizontal scrolling */
 }
 
 .matrix-sidebar {
-    width: 300px;
-    flex-shrink: 0;
-    /* Never allow it to squish or hide */
+    width: 280px;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
     position: sticky;
-    top: 1.5rem;
-    z-index: 10;
+    top: 5rem;
 }
 
 .sidebar-card {

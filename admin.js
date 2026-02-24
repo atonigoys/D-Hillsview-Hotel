@@ -191,7 +191,8 @@ function switchRatesSubPage(tabId) {
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     if (sidebar) {
-        sidebar.classList.toggle('open');
+        const isShown = sidebar.style.transform === 'translateX(0px)';
+        sidebar.style.transform = isShown ? 'translateX(-100%)' : 'translateX(0)';
     }
 }
 
