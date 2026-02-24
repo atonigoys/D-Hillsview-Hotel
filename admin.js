@@ -1258,58 +1258,61 @@ async function renderAvailMatrix(startDate) {
     const bottomScrollInner = document.getElementById('bottomScrollInner');
 
     if (wrap && bottomScroll && bottomScrollInner) {
-        console.log('🔄 Initializing Scroll Sync Engine...');
         let isSyncing = false;
 
         const syncWidth = () => {
             const chartArea = document.getElementById('tapeChart');
             if (chartArea && bottomScrollInner) {
-                // Use explicit calculation matching the grid CSS: 140px (label) + N days * 70px
-                const calculatedWidth = 140 + (currentTapeDays * 70);
-                const actualWidth = Math.max(calculatedWidth, chartArea.scrollWidth, wrap.scrollWidth);
+                // Use the scrollWidth of the chartArea to ensure the scrollbar matches the content exactly
+                const actualWidth = chartArea.scrollWidth;
                 bottomScrollInner.style.width = actualWidth + 'px';
-                console.log(`📏 Syncing Scrollbar Width: ${actualWidth}px (Calc: ${calculatedWidth}px, ChartArea: ${chartArea.scrollWidth}px)`);
+                
+                // If the wrap itself is wider than the content, we might not need the bottom scrollbar
+                if (wrap.clientWidth >= actualWidth) {
+                    bottomScroll.style.display = 'none';
+                } else {
+                    bottomScroll.style.display = 'block';
+                }
             }
         };
 
-        // Sync on initial load and after potential delays
+        // Sync initially and on various triggers
         syncWidth();
-        setTimeout(syncWidth, 100);
-        setTimeout(syncWidth, 500);
-        setTimeout(syncWidth, 2000);
-
-        // Robust: sync whenever the chart content changes
+        window.addEventListener('resize', syncWidth);
+        
+        // Use a MutationObserver to sync whenever the chart content changes
         if (window.matrixObserver) window.matrixObserver.disconnect();
-        window.matrixObserver = new MutationObserver(syncWidth);
+        window.matrixObserver = new MutationObserver(() => {
+            syncWidth();
+        });
         const chartArea = document.getElementById('tapeChart');
         if (chartArea) {
-            window.matrixObserver.observe(chartArea, { childList: true, subtree: true, attributes: true });
+            window.matrixObserver.observe(chartArea, { childList: true, subtree: true });
         }
 
-        window.addEventListener('resize', syncWidth);
-
-        // Use addEventListener to prevent overwriting
-        wrap.removeEventListener('scroll', window.wrapScrollHandler);
-        window.wrapScrollHandler = () => {
+        // Scroll synchronization with requestAnimationFrame for smoothness
+        const handleWrapScroll = () => {
             if (!isSyncing) {
                 isSyncing = true;
-                bottomScroll.scrollLeft = wrap.scrollLeft;
-                requestAnimationFrame(() => isSyncing = false);
+                requestAnimationFrame(() => {
+                    bottomScroll.scrollLeft = wrap.scrollLeft;
+                    isSyncing = false;
+                });
             }
         };
-        wrap.addEventListener('scroll', window.wrapScrollHandler);
 
-        bottomScroll.removeEventListener('scroll', window.bottomScrollHandler);
-        window.bottomScrollHandler = () => {
+        const handleBottomScroll = () => {
             if (!isSyncing) {
                 isSyncing = true;
-                wrap.scrollLeft = bottomScroll.scrollLeft;
-                requestAnimationFrame(() => isSyncing = false);
+                requestAnimationFrame(() => {
+                    wrap.scrollLeft = bottomScroll.scrollLeft;
+                    isSyncing = false;
+                });
             }
         };
-        bottomScroll.addEventListener('scroll', window.bottomScrollHandler);
-    } else {
-        console.warn('⚠️ Scroll sync targets missing:', { wrap: !!wrap, bottomScroll: !!bottomScroll, bottomScrollInner: !!bottomScrollInner });
+
+        wrap.addEventListener('scroll', handleWrapScroll);
+        bottomScroll.addEventListener('scroll', handleBottomScroll);
     }
 }
 
