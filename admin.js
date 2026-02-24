@@ -1089,12 +1089,27 @@ async function renderAvailMatrix(startDate) {
     });
 
     // ── ATTACH ROOM STATUS CLICK HANDLERS ──
-    chart.querySelectorAll('.tc-room-status').forEach(icon => {
-        icon.addEventListener('click', (e) => {
-            e.stopPropagation();
-            cycleRoomStatus(icon.dataset.room);
-        });
+});
     });
+
+// ── SYNC DUAL SCROLLBARS ──
+const wrap = document.getElementById('tapeChartWrap');
+const topScroll = document.getElementById('topScrollContainer');
+const topDummy = document.getElementById('topScrollDummy');
+
+if (wrap && topScroll && topDummy) {
+    // Match top dummy width to actual scroll width
+    topDummy.style.width = chart.scrollWidth + 'px';
+
+    // Sync Top -> Bottom
+    topScroll.onscroll = () => {
+        wrap.scrollLeft = topScroll.scrollLeft;
+    };
+    // Sync Bottom -> Top
+    wrap.onscroll = () => {
+        topScroll.scrollLeft = wrap.scrollLeft;
+    };
+}
 }
 
 /**

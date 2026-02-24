@@ -1565,12 +1565,41 @@ img {
     gap: 1rem;
 }
 
+.top-scrollbar-container {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    height: 14px;
+    margin-bottom: 4px;
+    background: transparent;
+    border-radius: var(--radius);
+}
+
+.top-scrollbar-dummy {
+    height: 1px;
+}
+
+/* Chrome, Edge, Safari for TOP scrollbar */
+.top-scrollbar-container::-webkit-scrollbar {
+    height: 12px;
+}
+
+.top-scrollbar-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.top-scrollbar-container::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 10px;
+    border: 3px solid var(--bg-card);
+}
+
 .tape-chart-wrap {
     overflow-x: scroll;
     /* Force scrollbar gutter */
     overflow-y: auto;
     /* Scroll rooms vertically */
-    max-height: 75vh;
+    max-height: 65vh;
     /* Keep horizontal scrollbar in view */
     border-radius: var(--radius);
     border: 1px solid var(--border-light);
