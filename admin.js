@@ -917,7 +917,9 @@ async function renderRatePlans() {
 // ----------------------------------------------------------
 // AVAILABILITY MATRIX — TAPE CHART
 // ----------------------------------------------------------
-const TAPE_DAYS = 30;
+let currentTapeDays = 30;
+let matrixCache = { bookings: null, config: null, lastFetch: 0 };
+const CACHE_TTL = 30000; // 30 seconds cache for infinite scroll expansion
 
 // Track manual room assignments: { bookingId: roomSlotNumber }
 const roomAssignments = {};
@@ -927,18 +929,27 @@ async function renderAvailMatrix(startDate) {
     const rangeLabel = document.getElementById('matrixDateRange');
     if (!chart) return;
 
-    // Fetch bookings and settings
-    const [bookingsRes, settingsRes] = await Promise.all([
-        window.supabaseClient.from('bookings').select('*'),
-        window.supabaseClient.from('settings').select('*').eq('id', 1).single()
-    ]);
+    // Fetch bookings and settings (with basic caching for infinite scroll)
+    const nowTs = Date.now();
+    let bookings, config;
 
-    const bookings = (bookingsRes.data || []).filter(b => b.status !== 'cancelled');
-    const config = settingsRes.data || {
-        inventory: { single: 10, deluxe: 10, family: 10 },
-        prices: { single: 180, deluxe: 320, family: 420 }
-    };
-    const roomStatuses = config.room_statuses || {}; // { "101": "clean", "102": "dirty", ... }
+    if (matrixCache.bookings && (nowTs - matrixCache.lastFetch < CACHE_TTL)) {
+        bookings = matrixCache.bookings;
+        config = matrixCache.config;
+    } else {
+        const [bookingsRes, settingsRes] = await Promise.all([
+            window.supabaseClient.from('bookings').select('*'),
+            window.supabaseClient.from('settings').select('*').eq('id', 1).single()
+        ]);
+        bookings = (bookingsRes.data || []).filter(b => b.status !== 'cancelled');
+        config = settingsRes.data || {
+            inventory: { single: 10, deluxe: 10, family: 10 },
+            prices: { single: 180, deluxe: 320, family: 420 }
+        };
+        matrixCache = { bookings, config, lastFetch: nowTs };
+    }
+
+    const roomStatuses = config.room_statuses || {};
 
     const roomTypes = [
         { id: 'single', name: 'Single Room', prefix: 1 },
@@ -948,7 +959,7 @@ async function renderAvailMatrix(startDate) {
 
     // Generate dates
     const dates = [];
-    for (let i = 0; i < TAPE_DAYS; i++) {
+    for (let i = 0; i < currentTapeDays; i++) {
         const d = new Date(startDate);
         d.setDate(d.getDate() + i);
         dates.push(d);
@@ -963,7 +974,7 @@ async function renderAvailMatrix(startDate) {
 
     // Update label
     const startLabel = `${monthNames[dates[0].getMonth()]} ${dates[0].getDate()}`;
-    const endLabel = `${monthNames[dates[TAPE_DAYS - 1].getMonth()]} ${dates[TAPE_DAYS - 1].getDate()}, ${dates[TAPE_DAYS - 1].getFullYear()}`;
+    const endLabel = `${monthNames[dates[currentTapeDays - 1].getMonth()]} ${dates[currentTapeDays - 1].getDate()}, ${dates[currentTapeDays - 1].getFullYear()}`;
     if (rangeLabel) rangeLabel.textContent = `${startLabel} — ${endLabel}`;
 
     // Helper: format date to YYYY-MM-DD (local)
@@ -971,8 +982,8 @@ async function renderAvailMatrix(startDate) {
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
-    // Columns: 1 label + TAPE_DAYS dates
-    chart.style.gridTemplateColumns = `140px repeat(${TAPE_DAYS}, 70px)`;
+    // Columns: 1 label + currentTapeDays dates
+    chart.style.gridTemplateColumns = `140px repeat(${currentTapeDays}, 70px)`;
 
     let html = '';
 
@@ -1105,13 +1116,22 @@ async function renderAvailMatrix(startDate) {
         // Match top dummy width to actual scroll width
         topDummy.style.width = chart.scrollWidth + 'px';
 
+        // Infinite Scroll Logic
+        wrap.onscroll = () => {
+            // Sync Top Bar
+            topScroll.scrollLeft = wrap.scrollLeft;
+
+            // Check if near end
+            const buffer = 400; // Load more when 400px from right edge
+            if (wrap.scrollLeft + wrap.clientWidth > wrap.scrollWidth - buffer) {
+                currentTapeDays += 30; // Add another month
+                renderAvailMatrix(matrixStartDate);
+            }
+        };
+
         // Sync Top -> Bottom
         topScroll.onscroll = () => {
             wrap.scrollLeft = topScroll.scrollLeft;
-        };
-        // Sync Bottom -> Top
-        wrap.onscroll = () => {
-            topScroll.scrollLeft = wrap.scrollLeft;
         };
     }
 }
@@ -1311,6 +1331,8 @@ function navigateMatrix(days) {
     } else {
         matrixStartDate.setDate(matrixStartDate.getDate() + days);
     }
+    currentTapeDays = 30; // Reset length on manual jump
+    matrixCache.lastFetch = 0; // Force refresh on manual jump
     renderAvailMatrix(matrixStartDate);
 }
 
