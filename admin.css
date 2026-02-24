@@ -1599,18 +1599,22 @@ img {
 /* ── Top Scrollbar ── */
 .top-scrollbar-container {
     position: sticky;
-    top: 0;
+    top: 61px;
+    /* Below topbar */
     z-index: 101;
     /* Above date headers */
     background: var(--bg-card);
     border-bottom: 2px solid var(--border-light);
     height: 18px;
     display: block !important;
+    overflow-x: scroll !important;
+    /* Force visibility */
 }
 
 .top-scrollbar-container::-webkit-scrollbar,
 .tape-chart-wrap::-webkit-scrollbar {
     height: 14px;
+    display: block !important;
 }
 
 .top-scrollbar-container::-webkit-scrollbar-track,
@@ -1621,7 +1625,8 @@ img {
 
 .top-scrollbar-container::-webkit-scrollbar-thumb,
 .tape-chart-wrap::-webkit-scrollbar-thumb {
-    background: var(--gold);
+    background: #ffcc00 !important;
+    /* Brighter gold */
     border: 3px solid var(--bg-card);
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
@@ -1672,8 +1677,8 @@ img {
 .tc-corner {
     position: sticky;
     left: 0;
-    top: 18px;
-    /* Offset by top scrollbar height */
+    top: 79px;
+    /* 61px (topbar) + 18px (scrollbar) */
     z-index: 20;
     background: var(--bg-card);
     padding: 0.6rem 0.8rem;
@@ -1685,8 +1690,8 @@ img {
 .tc-date-cell {
     position: sticky;
     /* Make dates sticky */
-    top: 18px;
-    /* Offset by top scrollbar height */
+    top: 79px;
+    /* 61px (topbar) + 18px (scrollbar) */
     z-index: 10;
     background: var(--bg-card);
     /* Solid background to cover scrolled content */

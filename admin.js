@@ -1,11 +1,11 @@
-// VERSION: 1.1.1 (Deployed: 2026-02-24 12:56)
+// VERSION: 1.1.2 (Deployed: 2026-02-24 16:20)
 /* ============================================================
    Hotel Luxe — admin.js
    Handles: auth check, tab switching, sidebar toggle, stats,
             booking filters, pricing persistence, and table rendering.
    ============================================================ */
 
-console.log('🔄 Admin script loading... (v1.1.1 - Infinite Scroll & Dual Scrollbars)');
+console.log('🔄 Admin script loading... (v1.1.2 - Sticky Scrollbars & High Contrast)');
 if (!window.supabaseClient) {
     console.warn('⚠️ Supabase client not found on load. Checking window...');
 }
@@ -1175,7 +1175,10 @@ async function renderAvailMatrix(startDate) {
     if (wrap) {
         // Sync top scrollbar width
         if (topScrollInner) {
-            topScrollInner.style.width = wrap.scrollWidth + 'px';
+            // Use a short delay to ensure the grid has rendered its full width
+            setTimeout(() => {
+                topScrollInner.style.width = wrap.scrollWidth + 'px';
+            }, 50);
         }
 
         // Handle scrolls
