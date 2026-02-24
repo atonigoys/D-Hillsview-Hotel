@@ -1566,13 +1566,14 @@ img {
 }
 
 .top-scrollbar-container {
-    overflow-x: scroll;
+    overflow-x: auto !important;
     overflow-y: hidden;
-    height: 14px;
-    margin-bottom: 4px;
-    background: transparent;
+    height: 20px;
+    /* Taller to accommodate thicker thumb */
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.02);
     border-radius: var(--radius);
-    max-width: calc(100vw - var(--sidebar-w) - 5rem);
+    max-width: calc(100vw - 320px);
 }
 
 .top-scrollbar-dummy {
@@ -1581,66 +1582,75 @@ img {
 
 /* Chrome, Edge, Safari for TOP scrollbar */
 .top-scrollbar-container::-webkit-scrollbar {
-    height: 12px;
+    height: 16px;
+    /* Higher for easier dragging */
 }
 
 .top-scrollbar-container::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.1);
+    /* Brighter track for orientation */
     border-radius: 10px;
 }
 
 .top-scrollbar-container::-webkit-scrollbar-thumb {
-    background: var(--gold);
+    background: #ffd700;
+    /* Brighter gold (Solid Gold) */
     border-radius: 10px;
-    border: 3px solid var(--bg-card);
+    border: 2px solid var(--bg-card);
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.top-scrollbar-container::-webkit-scrollbar-thumb:hover {
+    background: #ffffff;
+    /* Turns white on hover for clarity */
 }
 
 .tape-chart-wrap {
-    overflow-x: scroll;
-    /* Force scrollbar gutter */
+    overflow-x: auto !important;
+    /* Auto shows when needed, scroll always reserves space */
     overflow-y: auto;
-    /* Scroll rooms vertically */
-    /* Scroll rooms vertically */
-    max-height: 70vh;
-    /* Keep horizontal scrollbar in view */
+    max-height: 72vh;
     border-radius: var(--radius);
     border: 1px solid var(--border-light);
     background: var(--bg-card);
-    padding-bottom: 2px;
+    padding-bottom: 0px;
+    /* Removed padding that might clip scrollbar */
 
-    /* WIDTH CONSTRAINTS - Essential for horizontal scrolling */
+    /* WIDTH CONSTRAINTS */
     width: 100%;
-    max-width: calc(100vw - var(--sidebar-w) - 5rem);
+    max-width: calc(100vw - 320px);
+    /* Simple fallback for sidebar + padding */
     min-width: 0;
 
     /* IE/Firefox Support */
-    scrollbar-width: auto;
-    scrollbar-color: var(--gold) rgba(255, 255, 255, 0.05);
+    scrollbar-width: thick;
+    scrollbar-color: #ffd700 rgba(255, 255, 255, 0.1);
 }
 
-/* Custom Scrollbar for Chrome, Edge, Safari */
+/* Custom Scrollbar for Chrome, Edge, Safari (Bottom Scrollbar) */
 .tape-chart-wrap::-webkit-scrollbar {
-    height: 14px;
-    /* Much taller for visibility */
-    width: 8px;
-    /* Vertical scrollbar width */
+    height: 18px;
+    /* Extra thick for accessibility */
+    width: 10px;
     display: block;
 }
 
 .tape-chart-wrap::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
 }
 
 .tape-chart-wrap::-webkit-scrollbar-thumb {
-    background: var(--gold);
+    background: #ffd700;
+    /* Solid Gold */
     border-radius: 10px;
     border: 3px solid var(--bg-card);
-    /* Floating effect */
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 }
 
 .tape-chart-wrap::-webkit-scrollbar-thumb:hover {
-    background: #e5c07b;
+    background: #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
 }
 
 /* New Matrix Sidebar Layout */
@@ -1731,6 +1741,8 @@ img {
 .tape-chart {
     display: grid;
     min-width: max-content;
+    /* Critical: forces the grid to its full data width */
+    width: max-content;
 }
 
 /* Date Header Row */
