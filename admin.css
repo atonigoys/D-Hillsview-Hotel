@@ -103,16 +103,25 @@ img {
 }
 
 ::-webkit-scrollbar {
-    width: 5px;
+    width: 10px;
+    /* Increased from 5px for better visibility */
+    height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--bg-deep);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--gold-dark);
-    border-radius: 3px;
+    background: #ffd700;
+    /* Solid Gold */
+    border-radius: 10px;
+    border: 2px solid var(--bg-deep);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ffffff;
 }
 
 /* ============================================
