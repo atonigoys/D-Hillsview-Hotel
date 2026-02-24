@@ -421,16 +421,14 @@
                 <!-- ──── SUB-TAB: AVAILABILITY MATRIX ──── -->
                 <div class="rates-subtab hidden" id="subtab-avail-matrix">
                     <div class="tape-header">
-                        <div>
-                            <h2 style="font-family:'Playfair Display',serif; font-size:1.15rem;">Availability Matrix
-                            </h2>
+                        <div class="tape-title-group">
+                            <h2 style="font-family:'Playfair Display',serif; font-size:1.15rem; margin:0;">Availability
+                                Matrix</h2>
                             <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">Monthly room
                                 availability tape chart</p>
                         </div>
                         <div class="avail-nav">
-                            <span
-                                style="font-size: 0.8rem; font-weight: 700; color: #64748b; margin-right: 0.5rem;">Jump
-                                to Month:</span>
+                            <span style="font-size: 0.8rem; font-weight: 700; color: #64748b;">Jump to:</span>
                             <button class="topbar-btn" onclick="navigateMatrix(-1)"
                                 title="Go to previous month">◀</button>
                             <div class="nav-label-wrapper">
@@ -443,8 +441,7 @@
                                 </span>
                             </div>
                             <button class="topbar-btn" onclick="navigateMatrix(1)" title="Go to next month">▶</button>
-                            <button class="topbar-btn primary" style="margin-left:0.5rem;"
-                                onclick="navigateMatrix(0)">Today</button>
+                            <button class="topbar-btn primary" onclick="navigateMatrix(0)">Today</button>
                         </div>
                     </div>
 
@@ -454,10 +451,6 @@
 
                             <div class="tape-chart-wrap" id="tapeChartWrap">
                                 <div class="tape-chart" id="tapeChart"></div>
-                            </div>
-                            <!-- Bottom Scrollbar Container (Sticky at bottom of matrix) -->
-                            <div class="bottom-scrollbar-container" id="bottomScrollContainer">
-                                <div id="bottomScrollInner" style="height: 1px; min-height: 1px;"></div>
                             </div>
                         </div>
 

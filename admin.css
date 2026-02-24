@@ -1597,17 +1597,21 @@ img {
 .tape-header {
     display: flex !important;
     align-items: center !important;
-    justify-content: space-between !important;
+    justify-content: flex-start !important;
+    /* Navigation beside title */
+    gap: 2.5rem !important;
     margin-bottom: 2rem !important;
-    flex-wrap: nowrap !important;
-    /* Don't wrap, push nav to the right */
-    gap: 2rem;
     background: #ffffff !important;
     padding: 1.25rem 1.5rem !important;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
     color: #1e293b;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.tape-title-group {
+    display: flex;
+    flex-direction: column;
 }
 
 .tape-header h2 {
@@ -1640,9 +1644,7 @@ img {
 .avail-nav {
     display: flex !important;
     align-items: center;
-    gap: 1.25rem;
-    margin-left: auto;
-    /* Push to the right */
+    gap: 1rem;
     opacity: 1 !important;
     visibility: visible !important;
 }
@@ -1706,6 +1708,7 @@ img {
 
 .tape-chart-wrap {
     overflow-x: auto !important;
+    /* Forced horizontal scrolling */
     overflow-y: auto;
     max-height: 75vh;
     border-radius: 12px;
@@ -1713,53 +1716,39 @@ img {
     background: #ffffff;
     width: 100%;
     position: relative;
-    /* Hide native scrollbar */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    padding-bottom: 8px;
+    /* Cushion for scrollbar visibility */
 }
 
+/* ── NATIVE SCROLLBAR (GOLD & UNMISSABLE) ── */
 .tape-chart-wrap::-webkit-scrollbar {
-    width: 0 !important;
-    height: 0 !important;
-    display: none !important;
-}
-
-/* ── STICKY BOTTOM SCROLLBAR (UNMISSABLE) ── */
-.bottom-scrollbar-container {
-    position: sticky;
-    bottom: 0px;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    background: #ffffff !important;
-    border-top: 3px solid #3b82f6;
     height: 24px !important;
-    display: block !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
-}
-
-.bottom-scrollbar-container::-webkit-scrollbar {
-    height: 16px !important;
+    /* Extra thick scrollbar */
     display: block !important;
 }
 
-.bottom-scrollbar-container::-webkit-scrollbar-track {
+.tape-chart-wrap::-webkit-scrollbar-track {
     background: #f1f5f9 !important;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
 }
 
-.bottom-scrollbar-container::-webkit-scrollbar-thumb {
+.tape-chart-wrap::-webkit-scrollbar-thumb {
     background: #c9a96e !important;
-    /* GOLD */
-    border-radius: 20px;
-    border: 3px solid #f1f5f9;
+    /* BRIGHT GOLD thumb */
+    border-radius: 10px;
+    border: 4px solid #f1f5f9;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.25);
 }
 
-.bottom-scrollbar-container::-webkit-scrollbar-thumb:hover {
+.tape-chart-wrap::-webkit-scrollbar-thumb:hover {
     background: #b38f4d !important;
+}
+
+/* Firefox support */
+.tape-chart-wrap {
+    scrollbar-width: auto;
+    scrollbar-color: #c9a96e #f1f5f9;
 }
 
 
