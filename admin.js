@@ -1042,8 +1042,10 @@ async function renderAvailMatrix(startDate) {
         dates.forEach(d => {
             const ds = fmtDate(d);
             const isToday = ds === todayStr;
+            const dayIdx = d.getDay();
+            const dayName = dayNames[dayIdx] || '???';
             html += `<div class="tc-date-cell${isToday ? ' tc-today' : ''}">
-            <span class="tc-day-name">${dayNames[d.getDay()]}</span>
+            <span class="tc-day-name">${dayName}</span>
             <span class="tc-day-num">${d.getDate()} ${monthNames[d.getMonth()]}</span>
         </div>`;
         });
@@ -1167,38 +1169,23 @@ async function renderAvailMatrix(startDate) {
         });
     });
 
-    // ── INFINITE SCROLL & DUAL SCROLL SYNC ──
-    const wrap = document.getElementById('tapeChartWrap');
-    const topScroll = document.getElementById('topScrollContainer');
-    const topScrollInner = document.getElementById('topScrollInner');
-
     if (wrap) {
-        // Sync top scrollbar width
-        if (topScrollInner) {
-            // Use a short delay to ensure the grid has rendered its full width
-            setTimeout(() => {
-                topScrollInner.style.width = wrap.scrollWidth + 'px';
-            }, 50);
-        }
-
         // Handle scrolls
         wrap.onscroll = () => {
-            // Sync top scrollbar
-            if (topScroll) topScroll.scrollLeft = wrap.scrollLeft;
-
             // Infinite scroll logic
             const buffer = 400; // Load more when 400px from right edge
             if (wrap.scrollLeft + wrap.clientWidth > wrap.scrollWidth - buffer) {
                 currentTapeDays += 30; // Add another month
-                renderAvailMatrix(matrixStartDate);
+
+                // PRESERVE SCROLL POSITION
+                const oldScrollLeft = wrap.scrollLeft;
+                renderAvailMatrix(matrixStartDate).then(() => {
+                    // Restore scroll
+                    const newWrap = document.getElementById('tapeChartWrap');
+                    if (newWrap) newWrap.scrollLeft = oldScrollLeft;
+                });
             }
         };
-
-        if (topScroll) {
-            topScroll.onscroll = () => {
-                wrap.scrollLeft = topScroll.scrollLeft;
-            };
-        }
     }
 }
 

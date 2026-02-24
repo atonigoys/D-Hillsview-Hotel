@@ -1574,65 +1574,37 @@ img {
     gap: 1rem;
 }
 
-
 .tape-chart-wrap {
     overflow-x: auto !important;
-    /* Auto shows when needed, scroll always reserves space */
     overflow-y: auto;
     max-height: 72vh;
     border-radius: var(--radius);
     border: 1px solid var(--border-light);
     background: var(--bg-card);
-    padding-bottom: 0px;
-    /* Removed padding that might clip scrollbar */
-
-    /* WIDTH CONSTRAINTS */
     width: 100%;
     max-width: 100%;
     min-width: 0;
-
-    /* IE/Firefox Support */
     scrollbar-width: thick;
     scrollbar-color: #ffd700 rgba(255, 255, 255, 0.1);
 }
 
-/* ── Top Scrollbar ── */
-.top-scrollbar-container {
-    position: sticky;
-    top: 61px;
-    /* Below topbar */
-    z-index: 101;
-    /* Above date headers */
-    background: var(--bg-card);
-    border-bottom: 2px solid var(--border-light);
-    height: 18px;
-    display: block !important;
-    overflow-x: scroll !important;
-    /* Force visibility */
-}
-
-.top-scrollbar-container::-webkit-scrollbar,
 .tape-chart-wrap::-webkit-scrollbar {
     height: 14px;
     display: block !important;
 }
 
-.top-scrollbar-container::-webkit-scrollbar-track,
 .tape-chart-wrap::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
 }
 
-.top-scrollbar-container::-webkit-scrollbar-thumb,
 .tape-chart-wrap::-webkit-scrollbar-thumb {
     background: #ffcc00 !important;
-    /* Brighter gold */
     border: 3px solid var(--bg-card);
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 }
 
-.top-scrollbar-container::-webkit-scrollbar-thumb:hover,
 .tape-chart-wrap::-webkit-scrollbar-thumb:hover {
     background: #fff;
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
@@ -1677,8 +1649,7 @@ img {
 .tc-corner {
     position: sticky;
     left: 0;
-    top: 79px;
-    /* 61px (topbar) + 18px (scrollbar) */
+    top: 0;
     z-index: 20;
     background: var(--bg-card);
     padding: 0.6rem 0.8rem;
@@ -1690,8 +1661,7 @@ img {
 .tc-date-cell {
     position: sticky;
     /* Make dates sticky */
-    top: 79px;
-    /* 61px (topbar) + 18px (scrollbar) */
+    top: 0;
     z-index: 10;
     background: var(--bg-card);
     /* Solid background to cover scrolled content */
@@ -1703,6 +1673,7 @@ img {
     text-transform: uppercase;
     color: var(--text-muted);
     border-bottom: 2px solid var(--border-light);
+    border-right: 1px solid var(--border-light);
     min-width: 70px;
 }
 
@@ -1710,7 +1681,8 @@ img {
     display: block;
     font-size: 0.62rem;
     color: var(--text-muted);
-    opacity: 0.6;
+    opacity: 0.9;
+    font-weight: 600;
 }
 
 .tc-date-cell .tc-day-num {
@@ -1762,6 +1734,7 @@ img {
 .tc-group-day {
     background: rgba(255, 255, 255, 0.04);
     border-bottom: 1px solid var(--border-light);
+    border-right: 1px solid var(--border-light);
     position: relative;
     min-height: 28px;
 }
@@ -1794,6 +1767,7 @@ img {
 .tc-room-cell {
     position: relative;
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
     min-height: 36px;
 }
 
@@ -1875,6 +1849,7 @@ img {
     padding: 0.45rem 0;
     border-bottom: 1px solid var(--border-light);
     border-top: 1px solid var(--border-light);
+    border-right: 1px solid var(--border-light);
 }
 
 .tc-occ-cell.tc-today {
