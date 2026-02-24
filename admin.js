@@ -1169,9 +1169,23 @@ async function renderAvailMatrix(startDate) {
         });
     });
 
+    const wrap = document.getElementById('tapeChartWrap');
+    const bottomScroll = document.getElementById('bottomScrollContainer');
+    const bottomScrollInner = document.getElementById('bottomScrollInner');
+
     if (wrap) {
+        // Sync bottom scrollbar width
+        if (bottomScrollInner) {
+            setTimeout(() => {
+                bottomScrollInner.style.width = wrap.scrollWidth + 'px';
+            }, 50);
+        }
+
         // Handle scrolls
         wrap.onscroll = () => {
+            // Sync bottom scrollbar
+            if (bottomScroll) bottomScroll.scrollLeft = wrap.scrollLeft;
+
             // Infinite scroll logic
             const buffer = 400; // Load more when 400px from right edge
             if (wrap.scrollLeft + wrap.clientWidth > wrap.scrollWidth - buffer) {
@@ -1182,10 +1196,21 @@ async function renderAvailMatrix(startDate) {
                 renderAvailMatrix(matrixStartDate).then(() => {
                     // Restore scroll
                     const newWrap = document.getElementById('tapeChartWrap');
-                    if (newWrap) newWrap.scrollLeft = oldScrollLeft;
+                    if (newWrap) {
+                        newWrap.scrollLeft = oldScrollLeft;
+                        // Also sync bottom scrollbar
+                        const newBottom = document.getElementById('bottomScrollContainer');
+                        if (newBottom) newBottom.scrollLeft = oldScrollLeft;
+                    }
                 });
             }
         };
+
+        if (bottomScroll) {
+            bottomScroll.onscroll = () => {
+                wrap.scrollLeft = bottomScroll.scrollLeft;
+            };
+        }
     }
 }
 

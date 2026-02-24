@@ -1610,6 +1610,40 @@ img {
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
 }
 
+/* ── Bottom Scrollbar ── */
+.bottom-scrollbar-container {
+    position: sticky;
+    bottom: 0;
+    z-index: 101;
+    background: var(--bg-card);
+    border-top: 2px solid var(--border-light);
+    height: 18px;
+    display: block !important;
+    overflow-x: scroll !important;
+}
+
+.bottom-scrollbar-container::-webkit-scrollbar {
+    height: 14px;
+    display: block !important;
+}
+
+.bottom-scrollbar-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.bottom-scrollbar-container::-webkit-scrollbar-thumb {
+    background: #ffcc00 !important;
+    border: 3px solid var(--bg-card);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.bottom-scrollbar-container::-webkit-scrollbar-thumb:hover {
+    background: #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
 /* New Matrix Sidebar Layout */
 .matrix-layout {
     display: flex;
