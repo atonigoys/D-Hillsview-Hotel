@@ -1192,7 +1192,8 @@ img {
 
 /* Sub-Tab Navigation */
 .rates-tabs {
-    display: flex;
+    display: none;
+    /* Hidden for a clearer view, use sidebar instead */
     gap: 0.25rem;
     background: var(--bg-card);
     border: 1px solid var(--border-light);

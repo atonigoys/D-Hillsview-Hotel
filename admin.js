@@ -125,35 +125,57 @@ function toggleDropdown(id) {
     const dropdown = document.getElementById(id);
     if (!dropdown) return;
 
-    const isOpen = dropdown.classList.contains('open');
+    // Toggle logic
+    dropdown.classList.toggle('open');
 
     // Close others
-    document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.nav-dropdown').forEach(d => {
+        if (d.id !== id) d.classList.remove('open');
+    });
+}
 
-    if (!isOpen) {
-        dropdown.classList.add('open');
+/**
+ * Handle clicking the parent "Rates & Availability" item
+ */
+function handleRatesParentClick() {
+    const dropdown = document.getElementById('ratesDropdown');
+    const isAlreadyOpen = dropdown && dropdown.classList.contains('open');
+
+    if (!isAlreadyOpen) {
+        // Switch to default sub-page (Base Rates) and open
+        switchRatesSubPage('base-rates');
+    } else {
+        // Just toggle/close if already open
+        toggleDropdown('ratesDropdown');
     }
 }
 
 function switchRatesSubPage(tabId) {
     // 1. Switch to 'rates' page if not there
-    const ratesTab = document.querySelector('.nav-dropdown#ratesDropdown .nav-item');
-    switchPage(ratesTab, 'rates');
+    const ratesNavItem = document.querySelector('#ratesDropdown .nav-item');
+    switchPage(ratesNavItem, 'rates');
 
     // 2. Open dropdown
     const dropdown = document.getElementById('ratesDropdown');
     if (dropdown) dropdown.classList.add('open');
 
-    // 3. Highlight sub-item
+    // 3. Update Title & Highlight sub-item
+    const subTitles = {
+        'base-rates': 'Rates: Base Rates',
+        'rate-plans': 'Rates: Rate Plans & Packages',
+        'avail-matrix': 'Rates: Availability Matrix'
+    };
+
+    const titleEl = document.getElementById('topbarTitle');
+    if (titleEl && subTitles[tabId]) titleEl.textContent = subTitles[tabId];
+
     document.querySelectorAll('.nav-sub-item').forEach(item => {
         item.classList.remove('active');
-        if (item.textContent.toLowerCase().includes(tabId.replace('-', ' '))) {
-            item.classList.add('active');
-        }
-        // Specific checks for mixed naming
-        if (tabId === 'base-rates' && item.textContent === 'Base Rates') item.classList.add('active');
-        if (tabId === 'rate-plans' && item.textContent === 'Rate Plans & Packages') item.classList.add('active');
-        if (tabId === 'avail-matrix' && item.textContent === 'Availability Matrix') item.classList.add('active');
+        const text = item.textContent.toLowerCase();
+        if (text.includes(tabId.replace('-', ' '))) item.classList.add('active');
+        if (tabId === 'base-rates' && text === 'base rates') item.classList.add('active');
+        if (tabId === 'rate-plans' && text === 'rate plans & packages') item.classList.add('active');
+        if (tabId === 'avail-matrix' && text === 'availability matrix') item.classList.add('active');
     });
 
     // 4. Trigger the actual sub-tab render
