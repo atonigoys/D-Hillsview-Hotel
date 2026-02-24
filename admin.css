@@ -1595,18 +1595,19 @@ img {
 
 /* ── Tape Chart ── */
 .tape-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    background: white;
-    padding: 1rem 1.25rem;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 2rem !important;
+    flex-wrap: nowrap !important;
+    /* Don't wrap, push nav to the right */
+    gap: 2rem;
+    background: #ffffff !important;
+    padding: 1.25rem 1.5rem !important;
     border-radius: 12px;
-    border: 1px solid #e0e6ed;
+    border: 1px solid #e2e8f0;
     color: #1e293b;
-    /* Dark text for light background */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .tape-header h2 {
@@ -1706,66 +1707,41 @@ img {
 .tape-chart-wrap {
     overflow-x: auto !important;
     overflow-y: auto;
-    max-height: 72vh;
+    max-height: 75vh;
     border-radius: 12px;
     border: 1px solid #e0e6ed;
     background: #ffffff;
     width: 100%;
     position: relative;
-    /* Hide native scrollbar for all browsers */
-    -ms-overflow-style: none;
-    /* IE and Edge */
+    /* Hide native scrollbar */
     scrollbar-width: none;
-    /* Firefox */
+    -ms-overflow-style: none;
 }
 
 .tape-chart-wrap::-webkit-scrollbar {
-    display: none !important;
     width: 0 !important;
     height: 0 !important;
+    display: none !important;
 }
 
-/* Custom Scrollbars - Light Theme */
-.tape-chart-wrap::-webkit-scrollbar {
-    width: 10px;
-    height: 0px;
-}
-
-.tape-chart-wrap::-webkit-scrollbar-track {
-    background: #f1f5f9;
-}
-
-.tape-chart-wrap::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
-    border: 2px solid #f1f5f9;
-}
-
-.tape-chart-wrap::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-
-/* ── Bottom Scrollbar (Unmissable & Sticky) ── */
+/* ── STICKY BOTTOM SCROLLBAR (UNMISSABLE) ── */
 .bottom-scrollbar-container {
     position: sticky;
-    bottom: 0;
+    bottom: 0px;
     left: 0;
     width: 100%;
-    z-index: 2000;
+    z-index: 1000;
     background: #ffffff !important;
     border-top: 3px solid #3b82f6;
     height: 24px !important;
     display: block !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
-    box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.1);
-    margin-top: -1px;
-    /* Overlap border slightly for seamless look */
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
 }
 
-/* Force visible scrollbar on all browsers */
 .bottom-scrollbar-container::-webkit-scrollbar {
     height: 16px !important;
     display: block !important;
@@ -1773,19 +1749,19 @@ img {
 
 .bottom-scrollbar-container::-webkit-scrollbar-track {
     background: #f1f5f9 !important;
-    border-radius: 0;
 }
 
 .bottom-scrollbar-container::-webkit-scrollbar-thumb {
     background: #c9a96e !important;
-    /* GOLD thumb */
-    border-radius: 20px !important;
-    border: 3px solid #f1f5f9 !important;
+    /* GOLD */
+    border-radius: 20px;
+    border: 3px solid #f1f5f9;
 }
 
 .bottom-scrollbar-container::-webkit-scrollbar-thumb:hover {
     background: #b38f4d !important;
 }
+
 
 /* New Matrix Sidebar Layout */
 .matrix-layout {

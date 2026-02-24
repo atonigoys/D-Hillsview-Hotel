@@ -1274,21 +1274,21 @@ async function renderAvailMatrix(startDate) {
         updateWidth();
         setTimeout(updateWidth, 300); // Wait for potential late rendering
 
-        wrap.addEventListener('scroll', () => {
+        wrap.onscroll = () => {
             if (!isSyncing) {
                 isSyncing = true;
                 bottomScroll.scrollLeft = wrap.scrollLeft;
                 requestAnimationFrame(() => isSyncing = false);
             }
-        }, { passive: true });
+        };
 
-        bottomScroll.addEventListener('scroll', () => {
+        bottomScroll.onscroll = () => {
             if (!isSyncing) {
                 isSyncing = true;
                 wrap.scrollLeft = bottomScroll.scrollLeft;
                 requestAnimationFrame(() => isSyncing = false);
             }
-        }, { passive: true });
+        };
     }
 }
 
