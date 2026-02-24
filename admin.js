@@ -673,10 +673,19 @@ async function savePricing() {
 let matrixStartDate = new Date();
 matrixStartDate.setHours(0, 0, 0, 0);
 
+function navigateMatrix(days) {
+    if (days === 0) {
+        matrixStartDate = new Date();
+        matrixStartDate.setHours(0, 0, 0, 0);
+    } else {
+        matrixStartDate.setDate(matrixStartDate.getDate() + days);
+    }
+    renderAvailMatrix(matrixStartDate);
+}
+
 function renderRatesPage() {
     renderBaseRates();
     renderRatePlans();
-    // No longer calling renderAvailMatrix here directly, it's handled by sub-tab switching
 }
 
 // Sub-Tab Switching
@@ -928,7 +937,14 @@ const CACHE_TTL = 30000; // 30 seconds cache for infinite scroll expansion
 const roomAssignments = {};
 
 async function renderAvailMatrix(startDate) {
-    console.log('🗓️ Rendering Availability Matrix from:', startDate);
+    // 0. Ensure startDate is valid
+    if (!startDate || isNaN(new Date(startDate).getTime())) {
+        startDate = new Date();
+        startDate.setHours(0, 0, 0, 0);
+    }
+    matrixStartDate = new Date(startDate);
+
+    console.log('🗓️ Rendering Availability Matrix from:', matrixStartDate);
     const chart = document.getElementById('tapeChart');
     const rangeLabel = document.getElementById('matrixDateRange');
     if (!chart) {
@@ -993,13 +1009,9 @@ async function renderAvailMatrix(startDate) {
         const now = new Date();
         const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-        // Update label
-        const startLabel = `${monthNames[dates[0].getMonth()]} ${dates[0].getDate()}`;
-        const endLabel = `${monthNames[dates[currentTapeDays - 1].getMonth()]} ${dates[currentTapeDays - 1].getDate()}, ${dates[currentTapeDays - 1].getFullYear()}`;
-        if (rangeLabel) rangeLabel.textContent = `${startLabel} — ${endLabel}`;
-
         // Helper: format date to YYYY-MM-DD (local)
         function fmtDate(d) {
+            if (!(d instanceof Date) || isNaN(d)) return '';
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         }
 
@@ -1036,7 +1048,7 @@ async function renderAvailMatrix(startDate) {
             html += `</div>`;
 
             // Get bookings for this room type
-            const typeBookings = bookings.filter(b => b.room.toLowerCase().includes(rt.id));
+            const typeBookings = bookings.filter(b => b.room && b.room.toLowerCase().includes(rt.id));
 
             // Smart room assignment: respect manual assignments, then fill gaps
             function getSlotForBooking(booking, slotNum) {
