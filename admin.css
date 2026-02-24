@@ -1588,8 +1588,7 @@ img {
 
     /* WIDTH CONSTRAINTS */
     width: 100%;
-    max-width: calc(100vw - 320px);
-    /* Simple fallback for sidebar + padding */
+    max-width: 100%;
     min-width: 0;
 
     /* IE/Firefox Support */
@@ -1639,67 +1638,6 @@ img {
     /* Contains the scrollable wrap */
 }
 
-.matrix-sidebar {
-    width: 280px;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    position: sticky;
-    top: 5rem;
-}
-
-.sidebar-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius);
-    padding: 1.25rem;
-}
-
-.sidebar-card-title {
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--gold);
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.details-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-}
-
-.detail-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.detail-label {
-    font-size: 0.65rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    font-weight: 600;
-}
-
-.detail-val {
-    font-size: 0.9rem;
-    color: var(--text-primary);
-    font-weight: 500;
-}
-
-.detail-val.status {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    display: inline-block;
-    width: fit-content;
-    text-transform: capitalize;
-}
 
 .avail-legend {
     display: flex;
