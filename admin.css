@@ -1722,9 +1722,20 @@ img {
 }
 
 .tape-chart-wrap::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
+    width: 8px !important;
     height: 0 !important;
+    /* Hide horizontal on this specific container */
+    display: block !important;
+}
+
+.tape-chart-wrap::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.tape-chart-wrap::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 10px;
+    border: 2px solid #f1f5f9;
 }
 
 /* ── STICKY BOTTOM SCROLLBAR CONTAINER ── */
@@ -2284,5 +2295,54 @@ img {
         border-radius: 20px;
         margin-left: auto;
         margin-right: auto;
+    }
+
+    /* ── MATRIX SCROLL LEGEND ── */
+    .matrix-legend {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: #ffffff;
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .legend-title {
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        margin-bottom: 0.75rem;
+        line-height: 1.5;
+    }
+
+    .legend-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .legend-item strong {
+        color: var(--text-dark);
+        min-width: 140px;
+    }
+
+    .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
     }
 }
