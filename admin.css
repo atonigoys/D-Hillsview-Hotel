@@ -1707,14 +1707,22 @@ img {
     overflow-x: auto !important;
     overflow-y: auto;
     max-height: 72vh;
-    border-radius: 8px;
+    border-radius: 12px;
     border: 1px solid #e0e6ed;
-    background: #f8fafc;
+    background: #ffffff;
     width: 100%;
-    max-width: 100%;
     position: relative;
-    scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 #f1f5f9;
+    /* Hide native scrollbar for all browsers */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.tape-chart-wrap::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
 }
 
 /* Custom Scrollbars - Light Theme */
@@ -1737,22 +1745,24 @@ img {
     background: #94a3b8;
 }
 
-/* ── Bottom Scrollbar (Unmissable) ── */
+/* ── Bottom Scrollbar (Unmissable & Sticky) ── */
 .bottom-scrollbar-container {
     position: sticky;
     bottom: 0;
     left: 0;
     width: 100%;
     z-index: 2000;
-    /* Extremely high to be above everything */
     background: #ffffff !important;
     border-top: 3px solid #3b82f6;
-    /* Blue top border for visibility */
     height: 24px !important;
     display: block !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
     box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.1);
+    margin-top: -1px;
+    /* Overlap border slightly for seamless look */
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
 }
 
 /* Force visible scrollbar on all browsers */

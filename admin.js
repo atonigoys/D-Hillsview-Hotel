@@ -1265,28 +1265,29 @@ async function renderAvailMatrix(startDate) {
     const bottomScrollInner = document.getElementById('bottomScrollInner');
 
     if (wrap && bottomScroll && bottomScrollInner) {
-        // Sync bottom scrollbar width - Force multiple checks to ensure it catches the rendered width
+        let isSyncing = false;
+
         const updateWidth = () => {
             bottomScrollInner.style.width = chart.scrollWidth + 'px';
-            console.log('📏 Scrollbar sync width:', chart.scrollWidth);
         };
 
         updateWidth();
-        setTimeout(updateWidth, 100);
-        setTimeout(updateWidth, 500);
+        setTimeout(updateWidth, 300); // Wait for potential late rendering
 
-        // Handle scrolls
-        wrap.onscroll = () => {
-            bottomScroll.scrollLeft = wrap.scrollLeft;
-        };
-
-        bottomScroll.onscroll = () => {
-            wrap.scrollLeft = bottomScroll.scrollLeft;
-        };
-
-        // Ensure wrap doesn't scroll horizontally via touch/mousewheel without updating sync
         wrap.addEventListener('scroll', () => {
-            bottomScroll.scrollLeft = wrap.scrollLeft;
+            if (!isSyncing) {
+                isSyncing = true;
+                bottomScroll.scrollLeft = wrap.scrollLeft;
+                requestAnimationFrame(() => isSyncing = false);
+            }
+        }, { passive: true });
+
+        bottomScroll.addEventListener('scroll', () => {
+            if (!isSyncing) {
+                isSyncing = true;
+                wrap.scrollLeft = bottomScroll.scrollLeft;
+                requestAnimationFrame(() => isSyncing = false);
+            }
         }, { passive: true });
     }
 }
