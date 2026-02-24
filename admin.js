@@ -1157,40 +1157,14 @@ async function renderAvailMatrix(startDate) {
         });
     });
 
-    // ── SYNC DUAL SCROLLBARS ──
+    // ── INFINITE SCROLL ──
     const wrap = document.getElementById('tapeChartWrap');
-    const topScroll = document.getElementById('topScrollContainer');
-    const topDummy = document.getElementById('topScrollDummy');
-
-    if (wrap && topScroll && topDummy) {
-        // Match top dummy width to actual scroll width
-        topDummy.style.width = chart.scrollWidth + 'px';
-
-        let isSyncingTopScroll = false;
-        let isSyncingWrapScroll = false;
-
-        // Bottom -> Top
+    if (wrap) {
         wrap.onscroll = () => {
-            if (!isSyncingWrapScroll) {
-                isSyncingTopScroll = true;
-                topScroll.scrollLeft = wrap.scrollLeft;
-                setTimeout(() => { isSyncingTopScroll = false; }, 0);
-            }
-
-            // Infinite Scroll Logic
             const buffer = 400; // Load more when 400px from right edge
             if (wrap.scrollLeft + wrap.clientWidth > wrap.scrollWidth - buffer) {
                 currentTapeDays += 30; // Add another month
                 renderAvailMatrix(matrixStartDate);
-            }
-        };
-
-        // Top -> Bottom
-        topScroll.onscroll = () => {
-            if (!isSyncingTopScroll) {
-                isSyncingWrapScroll = true;
-                wrap.scrollLeft = topScroll.scrollLeft;
-                setTimeout(() => { isSyncingWrapScroll = false; }, 0);
             }
         };
     }

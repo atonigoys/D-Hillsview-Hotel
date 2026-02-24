@@ -1574,45 +1574,6 @@ img {
     gap: 1rem;
 }
 
-.top-scrollbar-container {
-    overflow-x: auto !important;
-    overflow-y: hidden;
-    height: 20px;
-    /* Taller to accommodate thicker thumb */
-    margin-bottom: 8px;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: var(--radius);
-    max-width: calc(100vw - 320px);
-}
-
-.top-scrollbar-dummy {
-    height: 1px;
-}
-
-/* Chrome, Edge, Safari for TOP scrollbar */
-.top-scrollbar-container::-webkit-scrollbar {
-    height: 16px;
-    /* Higher for easier dragging */
-}
-
-.top-scrollbar-container::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    /* Brighter track for orientation */
-    border-radius: 10px;
-}
-
-.top-scrollbar-container::-webkit-scrollbar-thumb {
-    background: #ffd700;
-    /* Brighter gold (Solid Gold) */
-    border-radius: 10px;
-    border: 2px solid var(--bg-card);
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
-}
-
-.top-scrollbar-container::-webkit-scrollbar-thumb:hover {
-    background: #ffffff;
-    /* Turns white on hover for clarity */
-}
 
 .tape-chart-wrap {
     overflow-x: auto !important;
