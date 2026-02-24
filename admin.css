@@ -1733,52 +1733,56 @@ img {
     left: 0;
     width: 100%;
     z-index: 9999 !important;
-    background: #c0c0c0 !important;
-    /* Classic Windows/Retro Grey */
-    border-top: 2px solid #808080;
-    height: 34px !important;
+    background: #d4d4d4 !important;
+    /* Classic Grey Track Area */
+    border-top: 1px solid #808080;
+    height: 38px !important;
+    /* Robust height */
     display: block !important;
     overflow-x: scroll !important;
-    /* FORCE scroll track visibility */
+    /* Always show track */
     overflow-y: hidden !important;
-    box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.2), 0 -5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
 }
 
 .bottom-scrollbar-container::-webkit-scrollbar {
-    height: 24px !important;
-    /* Prominent height for ease of use */
+    height: 32px !important;
+    /* Thick scrollbar like the image */
     display: block !important;
 }
 
 .bottom-scrollbar-container::-webkit-scrollbar-track {
     background: #d4d4d4 !important;
-    /* Light grey track */
-    border: 1px solid #808080;
+    border-top: 1px solid #808080;
 }
 
 .bottom-scrollbar-container::-webkit-scrollbar-thumb {
     background: #00bcff !important;
-    /* Vibrant Blue Thumb */
-    /* Virtual Ridges using linear-gradient */
-    background-image: repeating-linear-gradient(90deg,
-            rgba(0, 0, 0, 0.15) 0px,
-            rgba(0, 0, 0, 0.15) 2px,
-            transparent 2px,
-            transparent 4px) !important;
-    border: 1px solid #008cc2;
+    /* Vibrant Cyan/Blue */
+    /* Ridge Effect: 4 high-contrast vertical lines */
+    background-image: linear-gradient(90deg,
+            transparent 20%,
+            rgba(0, 0, 0, 0.3) 20%, rgba(0, 0, 0, 0.3) 25%,
+            transparent 25%, transparent 35%,
+            rgba(0, 0, 0, 0.3) 35%, rgba(0, 0, 0, 0.3) 40%,
+            transparent 40%, transparent 50%,
+            rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.3) 55%,
+            transparent 55%, transparent 65%,
+            rgba(0, 0, 0, 0.3) 65%, rgba(0, 0, 0, 0.3) 70%,
+            transparent 70%) !important;
+    border: 1px solid #005a80;
     border-radius: 2px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
     cursor: pointer !important;
+    min-width: 80px;
+    /* Ensure thumb is always grabbable */
 }
 
 .bottom-scrollbar-container::-webkit-scrollbar-thumb:hover {
-    background: #00a8e6 !important;
-}
-
-.bottom-scrollbar-container::-webkit-scrollbar-thumb:hover {
-    background: #b38f4d !important;
+    background-color: #0099dd !important;
+    filter: brightness(1.1);
 }
 
 

@@ -1263,44 +1263,50 @@ async function renderAvailMatrix(startDate) {
 
         const syncWidth = () => {
             const chartArea = document.getElementById('tapeChart');
-            if (chartArea) {
-                const newWidth = chartArea.scrollWidth;
+            if (chartArea && bottomScrollInner) {
+                // Measure the actual scrollable width of the wrap or the chart
+                const newWidth = Math.max(chartArea.scrollWidth, wrap.scrollWidth);
                 bottomScrollInner.style.width = newWidth + 'px';
-                console.log(`📏 Syncing Scrollbar Width: ${newWidth}px`);
+                console.log(`📏 Syncing Scrollbar Width: ${newWidth}px (Wrap: ${wrap.scrollWidth}px, Chart: ${chartArea.scrollWidth}px)`);
             }
         };
 
-        // Aggressive width syncing
+        // Sync on initial load and after potential delays
         syncWidth();
+        setTimeout(syncWidth, 100);
         setTimeout(syncWidth, 500);
-        setTimeout(syncWidth, 1000);
-        setTimeout(syncWidth, 3000);
+        setTimeout(syncWidth, 2000);
 
-        // Final fallback: check width every 2 seconds for a bit
-        let checks = 0;
-        const widthInterval = setInterval(() => {
-            syncWidth();
-            checks++;
-            if (checks > 10) clearInterval(widthInterval);
-        }, 2000);
+        // Robust: sync whenever the chart content changes
+        if (window.matrixObserver) window.matrixObserver.disconnect();
+        window.matrixObserver = new MutationObserver(syncWidth);
+        const chartArea = document.getElementById('tapeChart');
+        if (chartArea) {
+            window.matrixObserver.observe(chartArea, { childList: true, subtree: true, attributes: true });
+        }
 
         window.addEventListener('resize', syncWidth);
 
-        wrap.onscroll = () => {
+        // Use addEventListener to prevent overwriting
+        wrap.removeEventListener('scroll', window.wrapScrollHandler);
+        window.wrapScrollHandler = () => {
             if (!isSyncing) {
                 isSyncing = true;
                 bottomScroll.scrollLeft = wrap.scrollLeft;
                 requestAnimationFrame(() => isSyncing = false);
             }
         };
+        wrap.addEventListener('scroll', window.wrapScrollHandler);
 
-        bottomScroll.onscroll = () => {
+        bottomScroll.removeEventListener('scroll', window.bottomScrollHandler);
+        window.bottomScrollHandler = () => {
             if (!isSyncing) {
                 isSyncing = true;
                 wrap.scrollLeft = bottomScroll.scrollLeft;
                 requestAnimationFrame(() => isSyncing = false);
             }
         };
+        bottomScroll.addEventListener('scroll', window.bottomScrollHandler);
     } else {
         console.warn('⚠️ Scroll sync targets missing:', { wrap: !!wrap, bottomScroll: !!bottomScroll, bottomScrollInner: !!bottomScrollInner });
     }
