@@ -1264,10 +1264,11 @@ async function renderAvailMatrix(startDate) {
         const syncWidth = () => {
             const chartArea = document.getElementById('tapeChart');
             if (chartArea && bottomScrollInner) {
-                // Measure the actual scrollable width of the wrap or the chart
-                const newWidth = Math.max(chartArea.scrollWidth, wrap.scrollWidth);
-                bottomScrollInner.style.width = newWidth + 'px';
-                console.log(`📏 Syncing Scrollbar Width: ${newWidth}px (Wrap: ${wrap.scrollWidth}px, Chart: ${chartArea.scrollWidth}px)`);
+                // Use explicit calculation matching the grid CSS: 140px (label) + N days * 70px
+                const calculatedWidth = 140 + (currentTapeDays * 70);
+                const actualWidth = Math.max(calculatedWidth, chartArea.scrollWidth, wrap.scrollWidth);
+                bottomScrollInner.style.width = actualWidth + 'px';
+                console.log(`📏 Syncing Scrollbar Width: ${actualWidth}px (Calc: ${calculatedWidth}px, ChartArea: ${chartArea.scrollWidth}px)`);
             }
         };
 
