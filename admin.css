@@ -1737,36 +1737,44 @@ img {
     background: #94a3b8;
 }
 
-/* ── Bottom Scrollbar ── */
+/* ── Bottom Scrollbar (Unmissable) ── */
 .bottom-scrollbar-container {
     position: sticky;
-    bottom: -1px;
-    /* Ensure it stays at the very bottom of the wrap */
+    bottom: 0;
     left: 0;
     width: 100%;
-    z-index: 999;
-    /* Higher than headers */
-    background: #f8fafc;
-    border-top: 2px solid #e0e6ed;
-    height: 14px;
+    z-index: 2000;
+    /* Extremely high to be above everything */
+    background: #ffffff !important;
+    border-top: 3px solid #3b82f6;
+    /* Blue top border for visibility */
+    height: 24px !important;
     display: block !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
+    box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Force visible scrollbar on all browsers */
 .bottom-scrollbar-container::-webkit-scrollbar {
-    height: 10px;
+    height: 16px !important;
     display: block !important;
 }
 
 .bottom-scrollbar-container::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background: #f1f5f9 !important;
+    border-radius: 0;
 }
 
 .bottom-scrollbar-container::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
+    background: #c9a96e !important;
+    /* GOLD thumb */
+    border-radius: 20px !important;
+    border: 3px solid #f1f5f9 !important;
+}
+
+.bottom-scrollbar-container::-webkit-scrollbar-thumb:hover {
+    background: #b38f4d !important;
 }
 
 /* New Matrix Sidebar Layout */

@@ -1264,27 +1264,30 @@ async function renderAvailMatrix(startDate) {
     const bottomScroll = document.getElementById('bottomScrollContainer');
     const bottomScrollInner = document.getElementById('bottomScrollInner');
 
-    if (wrap) {
-        // Sync bottom scrollbar width
-        if (bottomScrollInner) {
-            setTimeout(() => {
-                bottomScrollInner.style.width = wrap.scrollWidth + 'px';
-            }, 50);
-        }
+    if (wrap && bottomScroll && bottomScrollInner) {
+        // Sync bottom scrollbar width - Force multiple checks to ensure it catches the rendered width
+        const updateWidth = () => {
+            bottomScrollInner.style.width = chart.scrollWidth + 'px';
+            console.log('📏 Scrollbar sync width:', chart.scrollWidth);
+        };
+
+        updateWidth();
+        setTimeout(updateWidth, 100);
+        setTimeout(updateWidth, 500);
 
         // Handle scrolls
         wrap.onscroll = () => {
-            // Sync bottom scrollbar
-            if (bottomScroll) bottomScroll.scrollLeft = wrap.scrollLeft;
-
-            // Infinite scroll logic REMOVED - Using Per-Month view
+            bottomScroll.scrollLeft = wrap.scrollLeft;
         };
 
-        if (bottomScroll) {
-            bottomScroll.onscroll = () => {
-                wrap.scrollLeft = bottomScroll.scrollLeft;
-            };
-        }
+        bottomScroll.onscroll = () => {
+            wrap.scrollLeft = bottomScroll.scrollLeft;
+        };
+
+        // Ensure wrap doesn't scroll horizontally via touch/mousewheel without updating sync
+        wrap.addEventListener('scroll', () => {
+            bottomScroll.scrollLeft = wrap.scrollLeft;
+        }, { passive: true });
     }
 }
 
