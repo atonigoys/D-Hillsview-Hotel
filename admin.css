@@ -1584,37 +1584,57 @@ img {
     width: 100%;
     max-width: 100%;
     min-width: 0;
+
+    /* IE/Firefox Support */
     scrollbar-width: thick;
     scrollbar-color: #ffd700 rgba(255, 255, 255, 0.1);
 }
 
+/* Custom Scrollbars */
 .tape-chart-wrap::-webkit-scrollbar {
+    width: 12px;
+    /* For vertical scrollbar */
+    height: 0px;
+    /* Hide horizontal scrollbar native height */
+}
+
+.tape-chart-wrap::-webkit-scrollbar:horizontal {
+    display: none !important;
+}
+
+.bottom-scrollbar-container::-webkit-scrollbar {
     height: 14px;
     display: block !important;
 }
 
-.tape-chart-wrap::-webkit-scrollbar-track {
+.tape-chart-wrap::-webkit-scrollbar-track,
+.bottom-scrollbar-container::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
 }
 
-.tape-chart-wrap::-webkit-scrollbar-thumb {
+.tape-chart-wrap::-webkit-scrollbar-thumb,
+.bottom-scrollbar-container::-webkit-scrollbar-thumb {
     background: #ffcc00 !important;
+    /* Brighter gold like the image */
     border: 3px solid var(--bg-card);
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
 }
 
-.tape-chart-wrap::-webkit-scrollbar-thumb:hover {
+.tape-chart-wrap::-webkit-scrollbar-thumb:hover,
+.bottom-scrollbar-container::-webkit-scrollbar-thumb:hover {
     background: #fff;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
 }
 
 /* ── Bottom Scrollbar ── */
 .bottom-scrollbar-container {
     position: sticky;
     bottom: 0;
-    z-index: 101;
+    left: 0;
+    width: 100%;
+    z-index: 105;
     background: var(--bg-card);
     border-top: 2px solid var(--border-light);
     height: 18px;
