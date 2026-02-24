@@ -428,16 +428,23 @@
                                 availability tape chart</p>
                         </div>
                         <div class="avail-nav">
-                            <button class="topbar-btn" onclick="navigateMatrix(-1)">◀ Prev Month</button>
-                            <span class="avail-nav-label" id="matrixDateRange">
-                                <i class="fas fa-calendar-alt"></i>
-                                <span>—</span>
-                                <i class="fas fa-chevron-down"
-                                    style="font-size: 0.7rem; opacity: 0.6; margin-left: 0.5rem;"></i>
-                            </span>
-                            <button class="topbar-btn" onclick="navigateMatrix(1)">Next Month ▶</button>
-                            <button class="topbar-btn" style="margin-left:0.5rem;" onclick="navigateMatrix(0)">This
-                                Month</button>
+                            <span
+                                style="font-size: 0.8rem; font-weight: 700; color: #64748b; margin-right: 0.5rem;">Jump
+                                to Month:</span>
+                            <button class="topbar-btn" onclick="navigateMatrix(-1)"
+                                title="Go to previous month">◀</button>
+                            <div class="nav-label-wrapper">
+                                <span class="avail-nav-label" id="matrixDateRange"
+                                    title="Click to pick a specific date/month">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>—</span>
+                                    <i class="fas fa-chevron-down"
+                                        style="font-size: 0.7rem; opacity: 0.6; margin-left: 0.5rem;"></i>
+                                </span>
+                            </div>
+                            <button class="topbar-btn" onclick="navigateMatrix(1)" title="Go to next month">▶</button>
+                            <button class="topbar-btn primary" style="margin-left:0.5rem;"
+                                onclick="navigateMatrix(0)">Today</button>
                         </div>
                     </div>
 
