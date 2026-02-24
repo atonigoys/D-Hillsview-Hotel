@@ -5,7 +5,7 @@
             booking filters, pricing persistence, and table rendering.
    ============================================================ */
 
-console.log('🔄 Admin script loading... (v1.0.2)');
+console.log('🔄 Admin script loading... (v1.1.1 - Infinite Scroll & Dual Scrollbars)');
 if (!window.supabaseClient) {
     console.warn('⚠️ Supabase client not found on load. Checking window...');
 }
