@@ -1732,26 +1732,32 @@ img {
     bottom: 0px;
     left: 0;
     width: 100%;
-    z-index: 1000;
-    background: #ffffff !important;
-    border-top: 3px solid #3b82f6;
-    /* Blue top line for visibility */
-    height: 24px !important;
+    z-index: 9999 !important;
+    /* Extremely high priority */
+    background: #f8fafc !important;
+    /* Light background for track contrast */
+    border-top: 4px solid #3b82f6;
+    /* Thicker blue visibility line */
+    height: 32px !important;
+    /* Taller */
     display: block !important;
-    overflow-x: auto !important;
+    overflow-x: scroll !important;
+    /* FORCE scrollbar track to show */
     overflow-y: hidden !important;
-    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.15);
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
 }
 
 .bottom-scrollbar-container::-webkit-scrollbar {
-    height: 16px !important;
+    height: 18px !important;
+    /* Taller thumb */
     display: block !important;
 }
 
 .bottom-scrollbar-container::-webkit-scrollbar-track {
     background: #f1f5f9 !important;
+    border-radius: 10px;
 }
 
 .bottom-scrollbar-container::-webkit-scrollbar-thumb {
