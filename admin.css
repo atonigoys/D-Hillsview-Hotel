@@ -1567,9 +1567,33 @@ img {
 
 .tape-chart-wrap {
     overflow-x: auto;
+    overflow-y: auto;
+    max-height: calc(100vh - 260px);
     border-radius: var(--radius);
     border: 1px solid var(--border-light);
     background: var(--bg-card);
+    position: relative;
+}
+
+/* Custom Prominent Scrollbar for Tape Chart */
+.tape-chart-wrap::-webkit-scrollbar {
+    height: 12px;
+    width: 8px;
+}
+
+.tape-chart-wrap::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.tape-chart-wrap::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 10px;
+    border: 2px solid #0a0a12;
+}
+
+.tape-chart-wrap::-webkit-scrollbar-thumb:hover {
+    background: #fff;
 }
 
 /* New Matrix Sidebar Layout */
