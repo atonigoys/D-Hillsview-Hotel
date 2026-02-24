@@ -1273,7 +1273,17 @@ async function renderAvailMatrix(startDate) {
         // Aggressive width syncing
         syncWidth();
         setTimeout(syncWidth, 500);
-        setTimeout(syncWidth, 2000); // Late safety catch
+        setTimeout(syncWidth, 1000);
+        setTimeout(syncWidth, 3000);
+
+        // Final fallback: check width every 2 seconds for a bit
+        let checks = 0;
+        const widthInterval = setInterval(() => {
+            syncWidth();
+            checks++;
+            if (checks > 10) clearInterval(widthInterval);
+        }, 2000);
+
         window.addEventListener('resize', syncWidth);
 
         wrap.onscroll = () => {
