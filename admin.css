@@ -1601,21 +1601,29 @@ img {
     display: flex;
     gap: 1.5rem;
     align-items: flex-start;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
 }
 
 .matrix-main {
     flex: 1;
     min-width: 0;
-    /* Important for horizontal scrolling */
+    /* Critical for horizontal scroll sibling */
+    overflow: hidden;
+    /* Prevent wide chart from breaking flex */
 }
 
 .matrix-sidebar {
-    width: 280px;
+    width: 300px;
+    flex-shrink: 0;
+    /* Never allow it to squish or hide */
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
     position: sticky;
-    top: 5rem;
+    top: 1.5rem;
+    z-index: 10;
 }
 
 .sidebar-card {
