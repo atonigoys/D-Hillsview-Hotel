@@ -1572,6 +1572,7 @@ img {
     margin-bottom: 4px;
     background: transparent;
     border-radius: var(--radius);
+    max-width: calc(100vw - var(--sidebar-w) - 5rem);
 }
 
 .top-scrollbar-dummy {
@@ -1599,12 +1600,18 @@ img {
     /* Force scrollbar gutter */
     overflow-y: auto;
     /* Scroll rooms vertically */
-    max-height: 65vh;
+    /* Scroll rooms vertically */
+    max-height: 70vh;
     /* Keep horizontal scrollbar in view */
     border-radius: var(--radius);
     border: 1px solid var(--border-light);
     background: var(--bg-card);
-    padding-bottom: 10px;
+    padding-bottom: 2px;
+
+    /* WIDTH CONSTRAINTS - Essential for horizontal scrolling */
+    width: 100%;
+    max-width: calc(100vw - var(--sidebar-w) - 5rem);
+    min-width: 0;
 
     /* IE/Firefox Support */
     scrollbar-width: auto;
@@ -1646,7 +1653,10 @@ img {
 .matrix-main {
     flex: 1;
     min-width: 0;
-    /* Important for horizontal scrolling */
+    /* Prevents container from expanding past flex parent */
+    max-width: 100%;
+    overflow-x: hidden;
+    /* Contains the scrollable wrap */
 }
 
 .matrix-sidebar {
@@ -2079,6 +2089,13 @@ img {
 
     .topbar {
         padding: 0.85rem 1.25rem;
+    }
+
+    /* Availability Matrix Mobile Width */
+    .top-scrollbar-container,
+    .tape-chart-wrap {
+        max-width: calc(100vw - 2.5rem);
+        /* dashboard-page padding: 1.25rem * 2 */
     }
 }
 

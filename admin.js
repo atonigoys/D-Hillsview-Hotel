@@ -1154,12 +1154,18 @@ async function renderAvailMatrix(startDate) {
         // Match top dummy width to actual scroll width
         topDummy.style.width = chart.scrollWidth + 'px';
 
-        // Infinite Scroll Logic
-        wrap.onscroll = () => {
-            // Sync Top Bar
-            topScroll.scrollLeft = wrap.scrollLeft;
+        let isSyncingTopScroll = false;
+        let isSyncingWrapScroll = false;
 
-            // Check if near end
+        // Bottom -> Top
+        wrap.onscroll = () => {
+            if (!isSyncingWrapScroll) {
+                isSyncingTopScroll = true;
+                topScroll.scrollLeft = wrap.scrollLeft;
+                setTimeout(() => { isSyncingTopScroll = false; }, 0);
+            }
+
+            // Infinite Scroll Logic
             const buffer = 400; // Load more when 400px from right edge
             if (wrap.scrollLeft + wrap.clientWidth > wrap.scrollWidth - buffer) {
                 currentTapeDays += 30; // Add another month
@@ -1167,9 +1173,13 @@ async function renderAvailMatrix(startDate) {
             }
         };
 
-        // Sync Top -> Bottom
+        // Top -> Bottom
         topScroll.onscroll = () => {
-            wrap.scrollLeft = topScroll.scrollLeft;
+            if (!isSyncingTopScroll) {
+                isSyncingWrapScroll = true;
+                wrap.scrollLeft = topScroll.scrollLeft;
+                setTimeout(() => { isSyncingWrapScroll = false; }, 0);
+            }
         };
     }
 }
