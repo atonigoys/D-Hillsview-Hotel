@@ -1576,23 +1576,24 @@ img {
 
 
 .tape-chart-wrap {
-    overflow-x: scroll !important;
-    /* Always show horizontal scrollbar */
+    overflow-x: auto !important;
+    /* Auto shows when needed, scroll always reserves space */
     overflow-y: auto;
     max-height: 72vh;
     border-radius: var(--radius);
     border: 1px solid var(--border-light);
     background: var(--bg-card);
     padding-bottom: 0px;
+    /* Removed padding that might clip scrollbar */
 
     /* WIDTH CONSTRAINTS */
     width: 100%;
     max-width: 100%;
     min-width: 0;
 
-    /* Firefox scrollbar */
+    /* IE/Firefox Support */
     scrollbar-width: thick;
-    scrollbar-color: #ffd700 rgba(255, 255, 255, 0.08);
+    scrollbar-color: #ffd700 rgba(255, 255, 255, 0.1);
 }
 
 /* ── Top Scrollbar ── */
@@ -1612,30 +1613,29 @@ img {
 
 .top-scrollbar-container::-webkit-scrollbar,
 .tape-chart-wrap::-webkit-scrollbar {
-    height: 18px;
+    height: 14px;
     display: block !important;
 }
 
 .top-scrollbar-container::-webkit-scrollbar-track,
 .tape-chart-wrap::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
-    border-top: 1px solid var(--border-light);
 }
 
 .top-scrollbar-container::-webkit-scrollbar-thumb,
 .tape-chart-wrap::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #ffd700, #e6b800) !important;
+    background: #ffcc00 !important;
+    /* Brighter gold */
     border: 3px solid var(--bg-card);
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-    min-width: 60px;
 }
 
 .top-scrollbar-container::-webkit-scrollbar-thumb:hover,
 .tape-chart-wrap::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #ffe44d, #ffd700) !important;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    background: #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
 }
 
 /* New Matrix Sidebar Layout */
@@ -1650,8 +1650,8 @@ img {
     min-width: 0;
     /* Prevents container from expanding past flex parent */
     max-width: 100%;
-    overflow: visible;
-    /* Let the tape-chart-wrap handle scrolling */
+    overflow-x: hidden;
+    /* Contains the scrollable wrap */
 }
 
 
