@@ -964,24 +964,28 @@ async function renderAvailMatrix(startDate) {
 
     // Update range label to show month
     if (rangeLabel) {
+        const textSpan = rangeLabel.querySelector('span');
         const monthNamesLong = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        rangeLabel.textContent = `${monthNamesLong[month]} ${year}`;
+        const labelText = `${monthNamesLong[month]} ${year}`;
+        if (textSpan) textSpan.textContent = labelText;
+        else rangeLabel.textContent = labelText;
     }
 
     // ── JUMP TO DATE PICKER ──
-    if (rangeLabel && !rangeLabel.dataset.fpInit) {
-        rangeLabel.style.cursor = 'pointer';
-        rangeLabel.title = 'Click to jump to a specific date';
+    if (rangeLabel && !rangeLabel._flatpickr) {
         flatpickr(rangeLabel, {
             dateFormat: "Y-m-d",
             defaultDate: matrixStartDate,
+            monthSelectorType: "static",
+            yearSelectorType: "static",
             onChange: (selectedDates) => {
                 if (selectedDates.length) {
                     renderAvailMatrix(selectedDates[0]);
                 }
             }
         });
-        rangeLabel.dataset.fpInit = "true";
+    } else if (rangeLabel && rangeLabel._flatpickr) {
+        rangeLabel._flatpickr.setDate(matrixStartDate, false);
     }
 
     const nowTs = Date.now();

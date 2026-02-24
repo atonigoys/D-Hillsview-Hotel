@@ -485,6 +485,30 @@ img {
     font-weight: 600;
 }
 
+/* ── Flatpickr Light Theme Overrides ── */
+.flatpickr-calendar {
+    background: #fff;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+    background: #3b82f6;
+    border-color: #3b82f6;
+}
+
+.flatpickr-months .flatpickr-month {
+    background: #f8fafc;
+    color: #1e293b;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+    font-weight: 700;
+}
+
 @keyframes slideDown {
     from {
         opacity: 0;
@@ -1529,21 +1553,7 @@ img {
     border-radius: var(--radius);
 }
 
-/* Availability Matrix */
-.avail-nav {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-}
-
-.avail-nav-label {
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--gold);
-    min-width: 160px;
-    text-align: center;
-}
-
+/* Availability Matrix Legend */
 .avail-legend {
     display: flex;
     gap: 1.5rem;
@@ -1571,7 +1581,47 @@ img {
     justify-content: space-between;
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 1.5rem;
+    background: white;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    border: 1px solid #e0e6ed;
+}
+
+.avail-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.avail-nav-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #1e293b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 180px;
+    justify-content: center;
+    user-select: none;
+}
+
+.avail-nav-label:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.avail-nav-label i {
+    color: #3b82f6;
+    font-size: 1rem;
 }
 
 .tape-chart-wrap {
@@ -1904,29 +1954,6 @@ img {
     font-weight: 600;
     font-size: 0.7rem;
     color: #64748b;
-    border-top: 1px solid #e0e6ed;
-
-    /* Maintenance Row */
-    .tc-maintenance .tc-room-label {
-        color: rgba(255, 255, 255, 0.35);
-    }
-
-    .tc-maintenance .tc-room-cell {
-        background: repeating-linear-gradient(-45deg,
-                transparent,
-                transparent 4px,
-                rgba(255, 255, 255, 0.02) 4px,
-                rgba(255, 255, 255, 0.02) 8px);
-        opacity: 0.5;
-    }
-
-    .tc-maintenance .tc-room-cell.tc-today {
-        background: repeating-linear-gradient(-45deg,
-                rgba(212, 168, 71, 0.03),
-                rgba(212, 168, 71, 0.03) 4px,
-                rgba(255, 255, 255, 0.02) 4px,
-                rgba(255, 255, 255, 0.02) 8px);
-    }
 
     /* Responsive adjustments for rates page */
     @media (max-width: 1024px) {
@@ -2182,3 +2209,4 @@ img {
         margin-left: auto;
         margin-right: auto;
     }
+}
