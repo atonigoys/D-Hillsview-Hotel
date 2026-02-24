@@ -1052,18 +1052,68 @@ async function renderAvailMatrix(startDate) {
 
         let html = '';
 
-        // ── DATE HEADER ROW ──
-        html += `<div class="tc-date-row">`;
+        // ── 1. MONTH HEADER ROW ──
+        html += `<div class="tc-header-row tc-month-row">`;
         html += `<div class="tc-corner"></div>`;
-        dates.forEach(d => {
+
+        // Group dates by month for spanning
+        const monthClusters = [];
+        dates.forEach((d, i) => {
+            const mKey = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+            if (monthClusters.length === 0 || monthClusters[monthClusters.length - 1].month !== mKey) {
+                monthClusters.push({ month: mKey, count: 1 });
+            } else {
+                monthClusters[monthClusters.length - 1].count++;
+            }
+        });
+
+        monthClusters.forEach(cluster => {
+            html += `<div class="tc-header-cell tc-month-cell" style="grid-column: span ${cluster.count}">${cluster.month}</div>`;
+        });
+        html += `</div>`;
+
+        // Calculate total occupancy per date (across all room types)
+        const totalInvAcrossTypes = roomTypes.reduce((sum, rt) => sum + (config.inventory[rt.id] || 10), 0);
+        const dailyOccupancy = dates.map(d => {
+            const ds = fmtDate(d);
+            const bookedTotal = bookings.filter(b => b.checkin <= ds && b.checkout > ds).length;
+            return totalInvAcrossTypes > 0 ? Math.round((bookedTotal / totalInvAcrossTypes) * 100) : 0;
+        });
+
+        // ── 2. DAY/DATE/OCC ROW ──
+        html += `<div class="tc-header-row tc-day-row">`;
+        html += `<div class="tc-corner"></div>`;
+        dates.forEach((d, i) => {
             const ds = fmtDate(d);
             const isToday = ds === todayStr;
-            const dayIdx = d.getDay();
-            const dayName = dayNames[dayIdx] || '???';
-            html += `<div class="tc-date-cell${isToday ? ' tc-today' : ''}">
-            <span class="tc-day-name">${dayName}</span>
-            <span class="tc-day-num">${d.getDate()} ${monthNames[d.getMonth()]}</span>
-        </div>`;
+            const dayName = dayNames[d.getDay()];
+            const occ = dailyOccupancy[i];
+            const weekendClass = (d.getDay() === 0 || d.getDay() === 6) ? ' tc-weekend-col' : '';
+            const todayClass = isToday ? ' tc-today-col' : '';
+
+            html += `<div class="tc-header-cell tc-day-cell${todayClass}${weekendClass}" data-date="${ds}">
+                <span class="tc-day-name">${dayName}</span>
+                <span class="tc-day-num">${d.getDate()}</span>
+                <span class="tc-day-occ">${occ}%</span>
+            </div>`;
+        });
+        html += `</div>`;
+
+        // ── 3. PRICE HEADER ROW ──
+        // (Since prices are per room type, we'll show an average or just a label "Rates")
+        html += `<div class="tc-header-row tc-price-row">`;
+        html += `<div class="tc-corner" style="display:flex; align-items:center; justify-content:center; font-size:0.7rem; color:var(--text-muted);">PRICE</div>`;
+        dates.forEach((d, i) => {
+            const ds = fmtDate(d);
+            const isToday = ds === todayStr;
+            const weekendClass = (d.getDay() === 0 || d.getDay() === 6) ? ' tc-weekend-col' : '';
+            const todayClass = isToday ? ' tc-today-col' : '';
+
+            // For the global header price, we'll show "Rates" or similar, 
+            // but the Cloudbeds image shows room-type-specific prices in the toggle headers.
+            // Let's just put a dash or the min price.
+            const minPrice = Math.min(...Object.values(config.prices));
+            html += `<div class="tc-header-cell tc-price-cell${todayClass}${weekendClass}">₱${minPrice.toLocaleString()}</div>`;
         });
         html += `</div>`;
 
@@ -1099,17 +1149,24 @@ async function renderAvailMatrix(startDate) {
             for (let r = 1; r <= inv; r++) {
                 const roomNum = rt.prefix * 100 + r;
                 const rStatus = roomStatuses[roomNum] || 'clean';
-                const statusIcon = rStatus === 'maintenance' ? '🔴' : rStatus === 'dirty' ? '🟡' : '🟢';
+                const statusDotClass = rStatus === 'maintenance' ? 'status-maint-dot' : rStatus === 'dirty' ? 'status-dirty-dot' : 'status-clean-dot';
                 const statusTitle = rStatus === 'maintenance' ? 'Maintenance' : rStatus === 'dirty' ? 'Dirty' : 'Clean';
-                html += `<div class="tc-room-row${rStatus === 'maintenance' ? ' tc-maintenance' : ''}">`;
-                html += `<div class="tc-room-label"><span class="tc-room-status" data-room="${roomNum}" title="${statusTitle} — Click to change">${statusIcon}</span> Room ${roomNum}</div>`;
+
+                html += `<div class="tc-room-row">`;
+                html += `<div class="tc-room-label">
+                    <span class="tc-room-status-dot ${statusDotClass}" data-room="${roomNum}" title="${statusTitle} — Click to change"></span>
+                    Room ${roomNum}
+                </div>`;
 
                 const roomSlotBookings = typeBookings.filter(b => getSlotForBooking(b, r));
 
                 dates.forEach((d, colIdx) => {
                     const ds = fmtDate(d);
                     const isToday = ds === todayStr;
-                    html += `<div class="tc-room-cell${isToday ? ' tc-today' : ''}" data-room="${roomNum}" data-room-type="${rt.id}" data-slot="${r}" data-date="${ds}">`;
+                    const weekendClass = (d.getDay() === 0 || d.getDay() === 6) ? ' tc-weekend-col' : '';
+                    const todayClass = isToday ? ' tc-today-col' : '';
+
+                    html += `<div class="tc-room-cell${todayClass}${weekendClass}" data-room="${roomNum}" data-room-type="${rt.id}" data-slot="${r}" data-date="${ds}">`;
 
                     roomSlotBookings.forEach(b => {
                         if (!b.checkin || !b.checkout) return; // Skip broken bookings
@@ -1127,13 +1184,12 @@ async function renderAvailMatrix(startDate) {
                                 }
 
                                 const spanDays = Math.max(1, Math.round((endD - startD) / 86400000));
+                                const widthPx = spanDays * 70 - 8;
 
-                                const widthPx = spanDays * 70 - 2;
-
-                                const statusClass = b.status === 'confirmed' ? 'status-confirmed'
-                                    : b.status === 'pending' ? 'status-pending'
-                                        : b.status === 'checked-in' ? 'status-checked-in'
-                                            : 'status-cancelled';
+                                const statusClass = b.status === 'confirmed' ? 'status-confirmed-bar'
+                                    : b.status === 'pending' ? 'status-pending-bar'
+                                        : b.status === 'checked-in' ? 'status-checked-in-bar'
+                                            : 'status-cancelled-bar';
 
                                 const guestName = b.guest || b.email?.split('@')[0] || 'Guest';
                                 html += `<div class="tc-booking-bar ${statusClass}" draggable="true" data-booking-id="${b.id}" data-room-type="${rt.id}" style="width:${widthPx}px;" title="${guestName} — ${b.checkin} to ${b.checkout} (${b.status})">${guestName}</div>`;
@@ -1150,13 +1206,14 @@ async function renderAvailMatrix(startDate) {
             // ── OCCUPANCY ROW ──
             html += `<div class="tc-occ-row">`;
             html += `<div class="tc-occ-label">Occupancy</div>`;
-            dates.forEach(d => {
+            dates.forEach((d, i) => {
                 const ds = fmtDate(d);
                 const isToday = ds === todayStr;
-                const bookedCount = typeBookings.filter(b => b.checkin <= ds && b.checkout > ds).length;
-                const pct = inv > 0 ? Math.round((bookedCount / inv) * 100) : 0;
-                const occClass = pct >= 80 ? 'occ-high' : pct >= 40 ? 'occ-med' : 'occ-low';
-                html += `<div class="tc-occ-cell${isToday ? ' tc-today' : ''} ${occClass}">${pct}%</div>`;
+                const occ = dailyOccupancy[i];
+                const occClass = occ >= 80 ? 'occ-high' : occ >= 40 ? 'occ-med' : 'occ-low';
+                const weekendClass = (d.getDay() === 0 || d.getDay() === 6) ? ' tc-weekend-col' : '';
+                const todayClass = isToday ? ' tc-today-col' : '';
+                html += `<div class="tc-occ-cell${todayClass}${weekendClass} ${occClass}">${occ}%</div>`;
             });
             html += `</div>`;
         });
@@ -1178,7 +1235,7 @@ async function renderAvailMatrix(startDate) {
     // ── ATTACH CLICK HANDLERS ──
 
     // ── ATTACH ROOM STATUS CLICK HANDLERS ──
-    chart.querySelectorAll('.tc-room-status').forEach(icon => {
+    chart.querySelectorAll('.tc-room-status-dot').forEach(icon => {
         icon.addEventListener('click', (e) => {
             e.stopPropagation();
             cycleRoomStatus(icon.dataset.room);
