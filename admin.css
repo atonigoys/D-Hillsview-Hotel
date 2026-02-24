@@ -1596,27 +1596,38 @@ img {
     scrollbar-color: #ffd700 rgba(255, 255, 255, 0.1);
 }
 
-/* Custom Scrollbar for Chrome, Edge, Safari (Bottom Scrollbar) */
-.tape-chart-wrap::-webkit-scrollbar {
+/* ── Top Scrollbar ── */
+.top-scrollbar-container {
+    position: sticky;
+    top: 0;
+    z-index: 101;
+    /* Above date headers */
+    background: var(--bg-card);
+    border-bottom: 2px solid var(--border-light);
     height: 18px;
-    /* Extra thick for accessibility */
-    width: 10px;
-    display: block;
+    display: block !important;
 }
 
+.top-scrollbar-container::-webkit-scrollbar,
+.tape-chart-wrap::-webkit-scrollbar {
+    height: 14px;
+}
+
+.top-scrollbar-container::-webkit-scrollbar-track,
 .tape-chart-wrap::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
 }
 
+.top-scrollbar-container::-webkit-scrollbar-thumb,
 .tape-chart-wrap::-webkit-scrollbar-thumb {
-    background: #ffd700;
-    /* Solid Gold */
-    border-radius: 10px;
+    background: var(--gold);
     border: 3px solid var(--bg-card);
+    border-radius: 10px;
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 }
 
+.top-scrollbar-container::-webkit-scrollbar-thumb:hover,
 .tape-chart-wrap::-webkit-scrollbar-thumb:hover {
     background: #fff;
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
@@ -1661,10 +1672,9 @@ img {
 .tc-corner {
     position: sticky;
     left: 0;
-    top: 0;
-    /* Add sticky top */
+    top: 18px;
+    /* Offset by top scrollbar height */
     z-index: 20;
-    /* High z-index to stay above corner and rows */
     background: var(--bg-card);
     padding: 0.6rem 0.8rem;
     min-width: 140px;
@@ -1675,7 +1685,8 @@ img {
 .tc-date-cell {
     position: sticky;
     /* Make dates sticky */
-    top: 0;
+    top: 18px;
+    /* Offset by top scrollbar height */
     z-index: 10;
     background: var(--bg-card);
     /* Solid background to cover scrolled content */

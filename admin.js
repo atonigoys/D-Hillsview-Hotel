@@ -952,6 +952,22 @@ async function renderAvailMatrix(startDate) {
         return;
     }
 
+    // ── JUMP TO DATE PICKER ──
+    if (rangeLabel && !rangeLabel.dataset.fpInit) {
+        rangeLabel.style.cursor = 'pointer';
+        rangeLabel.title = 'Click to jump to a specific date';
+        flatpickr(rangeLabel, {
+            dateFormat: "Y-m-d",
+            defaultDate: matrixStartDate,
+            onChange: (selectedDates) => {
+                if (selectedDates.length) {
+                    renderAvailMatrix(selectedDates[0]);
+                }
+            }
+        });
+        rangeLabel.dataset.fpInit = "true";
+    }
+
     const nowTs = Date.now();
     let bookings, config;
 
@@ -1151,16 +1167,35 @@ async function renderAvailMatrix(startDate) {
         });
     });
 
-    // ── INFINITE SCROLL ──
+    // ── INFINITE SCROLL & DUAL SCROLL SYNC ──
     const wrap = document.getElementById('tapeChartWrap');
+    const topScroll = document.getElementById('topScrollContainer');
+    const topScrollInner = document.getElementById('topScrollInner');
+
     if (wrap) {
+        // Sync top scrollbar width
+        if (topScrollInner) {
+            topScrollInner.style.width = wrap.scrollWidth + 'px';
+        }
+
+        // Handle scrolls
         wrap.onscroll = () => {
+            // Sync top scrollbar
+            if (topScroll) topScroll.scrollLeft = wrap.scrollLeft;
+
+            // Infinite scroll logic
             const buffer = 400; // Load more when 400px from right edge
             if (wrap.scrollLeft + wrap.clientWidth > wrap.scrollWidth - buffer) {
                 currentTapeDays += 30; // Add another month
                 renderAvailMatrix(matrixStartDate);
             }
         };
+
+        if (topScroll) {
+            topScroll.onscroll = () => {
+                wrap.scrollLeft = topScroll.scrollLeft;
+            };
+        }
     }
 }
 
