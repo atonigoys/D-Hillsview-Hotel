@@ -1,4 +1,4 @@
-// VERSION: 1.0.2 (Supabase Migration Fix)
+// VERSION: 1.1.1 (Deployed: 2026-02-24 12:56)
 /* ============================================================
    Hotel Luxe — admin.js
    Handles: auth check, tab switching, sidebar toggle, stats,
