@@ -1008,10 +1008,78 @@ async function renderAvailMatrix(startDate) {
     // ── ATTACH DRAG-AND-DROP LISTENERS ──
     attachTapeChartDragDrop(chart, bookings);
 
+    // ── ATTACH CLICK HANDLERS ──
+    chart.querySelectorAll('.tc-booking-bar').forEach(bar => {
+        bar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showBookingDetails(bar.dataset.bookingId, bookings);
+        });
+    });
+
     // ── ATTACH ROOM STATUS CLICK HANDLERS ──
     chart.querySelectorAll('.tc-room-status').forEach(icon => {
-        icon.addEventListener('click', () => cycleRoomStatus(icon.dataset.room));
+        icon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            cycleRoomStatus(icon.dataset.room);
+        });
     });
+}
+
+/**
+ * Populate Sidebar with Booking Details
+ */
+function showBookingDetails(bookingId, bookings) {
+    const detailContent = document.getElementById('bookingDetailsContent');
+    if (!detailContent) return;
+
+    const b = bookings.find(item => item.id.toString() === bookingId);
+    if (!b) return;
+
+    const statusColors = {
+        'confirmed': '#2ecc71',
+        'pending': 'var(--gold)',
+        'checked-in': '#3498db',
+        'cancelled': '#888'
+    };
+
+    detailContent.innerHTML = `
+        <div class="detail-item">
+            <span class="detail-label">Guest</span>
+            <span class="detail-val" style="font-weight:700; color:var(--gold);">${b.guest}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Reference</span>
+            <span class="detail-val">#${b.ref}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Status</span>
+            <span class="detail-val status" style="background:${statusColors[b.status] || '#555'}; color:#fff;">${b.status}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Room Type</span>
+            <span class="detail-val">${b.room}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Check-In</span>
+            <span class="detail-val">📅 ${b.checkin}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Check-Out</span>
+            <span class="detail-val">📅 ${b.checkout}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Stay Duration</span>
+            <span class="detail-val">🌙 ${b.nights} night${b.nights > 1 ? 's' : ''}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Total Amount</span>
+            <span class="detail-val" style="font-size:1.1rem; color:var(--gold); font-weight:700;">₱${(b.amount || 0).toLocaleString()}</span>
+        </div>
+        <div style="margin-top:1rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+            ${b.status === 'pending' ? `<button class="topbar-btn primary" style="padding:0.4rem 0.8rem; font-size:0.75rem;" onclick="confirmBooking('${b.ref}')">✅ Confirm</button>` : ''}
+            <button class="topbar-btn" style="padding:0.4rem 0.8rem; font-size:0.75rem;" onclick="switchPage(document.querySelector('[data-page=bookings]'), 'bookings'); document.getElementById('bookingSearch').value='${b.ref}'; applyFilters();">📂 View Full</button>
+        </div>
+    `;
 }
 
 // ── DRAG-AND-DROP ENGINE ──
