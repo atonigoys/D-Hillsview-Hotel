@@ -25,6 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. RBAC - Apply Permissions
     applyPermissions();
+
+    // 4. SCROLLBAR SYNC ON RESIZE
+    window.addEventListener('resize', () => {
+        const wrap = document.getElementById('tapeChartWrap');
+        const inner = document.getElementById('bottomScrollInner');
+        if (wrap && inner) {
+            inner.style.width = wrap.scrollWidth + 'px';
+        }
+    });
 });
 
 function applyPermissions() {

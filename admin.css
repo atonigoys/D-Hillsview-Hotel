@@ -1740,19 +1740,24 @@ img {
 /* ── Bottom Scrollbar ── */
 .bottom-scrollbar-container {
     position: sticky;
-    bottom: 0;
+    bottom: -1px;
+    /* Ensure it stays at the very bottom of the wrap */
     left: 0;
     width: 100%;
-    z-index: 105;
-    background: white;
-    border-top: 1px solid #e0e6ed;
+    z-index: 999;
+    /* Higher than headers */
+    background: #f8fafc;
+    border-top: 2px solid #e0e6ed;
     height: 14px;
     display: block !important;
-    overflow-x: scroll !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
 }
 
+/* Force visible scrollbar on all browsers */
 .bottom-scrollbar-container::-webkit-scrollbar {
     height: 10px;
+    display: block !important;
 }
 
 .bottom-scrollbar-container::-webkit-scrollbar-track {
