@@ -671,14 +671,17 @@ async function savePricing() {
 // RATES & AVAILABILITY PAGE
 // ----------------------------------------------------------
 let matrixStartDate = new Date();
+matrixStartDate.setDate(1); // Start at the 1st of the month
 matrixStartDate.setHours(0, 0, 0, 0);
 
-function navigateMatrix(days) {
-    if (days === 0) {
+function navigateMatrix(months) {
+    if (months === 0) {
         matrixStartDate = new Date();
+        matrixStartDate.setDate(1);
         matrixStartDate.setHours(0, 0, 0, 0);
     } else {
-        matrixStartDate.setDate(matrixStartDate.getDate() + days);
+        matrixStartDate.setMonth(matrixStartDate.getMonth() + months);
+        matrixStartDate.setDate(1);
     }
     renderAvailMatrix(matrixStartDate);
 }
@@ -940,16 +943,29 @@ async function renderAvailMatrix(startDate) {
     // 0. Ensure startDate is valid
     if (!startDate || isNaN(new Date(startDate).getTime())) {
         startDate = new Date();
+        startDate.setDate(1);
         startDate.setHours(0, 0, 0, 0);
     }
     matrixStartDate = new Date(startDate);
+    matrixStartDate.setDate(1); // Always start at 1st
 
-    console.log('🗓️ Rendering Availability Matrix from:', matrixStartDate);
+    // Calculate days in this month
+    const year = matrixStartDate.getFullYear();
+    const month = matrixStartDate.getMonth();
+    currentTapeDays = new Date(year, month + 1, 0).getDate();
+
+    console.log(`🗓️ Rendering Availability Matrix for: ${year}-${month + 1} (${currentTapeDays} days)`);
     const chart = document.getElementById('tapeChart');
     const rangeLabel = document.getElementById('matrixDateRange');
     if (!chart) {
         console.warn('⚠️ #tapeChart not found in DOM.');
         return;
+    }
+
+    // Update range label to show month
+    if (rangeLabel) {
+        const monthNamesLong = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        rangeLabel.textContent = `${monthNamesLong[month]} ${year}`;
     }
 
     // ── JUMP TO DATE PICKER ──
@@ -1186,24 +1202,7 @@ async function renderAvailMatrix(startDate) {
             // Sync bottom scrollbar
             if (bottomScroll) bottomScroll.scrollLeft = wrap.scrollLeft;
 
-            // Infinite scroll logic
-            const buffer = 400; // Load more when 400px from right edge
-            if (wrap.scrollLeft + wrap.clientWidth > wrap.scrollWidth - buffer) {
-                currentTapeDays += 30; // Add another month
-
-                // PRESERVE SCROLL POSITION
-                const oldScrollLeft = wrap.scrollLeft;
-                renderAvailMatrix(matrixStartDate).then(() => {
-                    // Restore scroll
-                    const newWrap = document.getElementById('tapeChartWrap');
-                    if (newWrap) {
-                        newWrap.scrollLeft = oldScrollLeft;
-                        // Also sync bottom scrollbar
-                        const newBottom = document.getElementById('bottomScrollContainer');
-                        if (newBottom) newBottom.scrollLeft = oldScrollLeft;
-                    }
-                });
-            }
+            // Infinite scroll logic REMOVED - Using Per-Month view
         };
 
         if (bottomScroll) {
@@ -1346,17 +1345,7 @@ async function cycleRoomStatus(roomNum) {
     renderAvailMatrix(matrixStartDate);
 }
 
-function navigateMatrix(days) {
-    if (days === 0) {
-        matrixStartDate = new Date();
-        matrixStartDate.setHours(0, 0, 0, 0);
-    } else {
-        matrixStartDate.setDate(matrixStartDate.getDate() + days);
-    }
-    currentTapeDays = 30; // Reset length on manual jump
-    matrixCache.lastFetch = 0; // Force refresh on manual jump
-    renderAvailMatrix(matrixStartDate);
-}
+// navigateMatrix moved to global section for consistency
 
 /**
  * Custom Toast Notification System
