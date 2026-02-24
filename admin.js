@@ -1162,7 +1162,7 @@ async function renderAvailMatrix(startDate) {
                 const statusDotClass = rStatus === 'maintenance' ? 'status-maint-dot' : rStatus === 'dirty' ? 'status-dirty-dot' : 'status-clean-dot';
                 const statusTitle = rStatus === 'maintenance' ? 'Maintenance' : rStatus === 'dirty' ? 'Dirty' : 'Clean';
 
-                html += `<div class="tc-room-row">`;
+                html += `<div class="tc-room-row" style="overflow: hidden; position: relative;">`;
                 html += `<div class="tc-room-label">
                     <span class="tc-room-status-dot ${statusDotClass}" data-room="${roomNum}" title="${statusTitle} — Click to change"></span>
                     Room ${roomNum}
@@ -1262,13 +1262,15 @@ async function renderAvailMatrix(startDate) {
 
         const syncWidth = () => {
             const chartArea = document.getElementById('tapeChart');
-            if (chartArea && bottomScrollInner) {
-                // Use the scrollWidth of the chartArea to ensure the scrollbar matches the content exactly
-                const actualWidth = chartArea.scrollWidth;
-                bottomScrollInner.style.width = actualWidth + 'px';
-                
-                // If the wrap itself is wider than the content, we might not need the bottom scrollbar
-                if (wrap.clientWidth >= actualWidth) {
+            if (chartArea && bottomScrollInner && wrap) {
+                // Use explicit calculation matching the grid CSS: 140px (label) + N days * 70px
+                const calculatedWidth = 140 + (currentTapeDays * 70);
+
+                // Set the inner scrollbar width to EXACTLY the calculated width of the chart content
+                bottomScrollInner.style.width = calculatedWidth + 'px';
+
+                // Toggle visibility based on whether scrolling is actually needed
+                if (wrap.clientWidth >= calculatedWidth) {
                     bottomScroll.style.display = 'none';
                 } else {
                     bottomScroll.style.display = 'block';
@@ -1279,7 +1281,7 @@ async function renderAvailMatrix(startDate) {
         // Sync initially and on various triggers
         syncWidth();
         window.addEventListener('resize', syncWidth);
-        
+
         // Use a MutationObserver to sync whenever the chart content changes
         if (window.matrixObserver) window.matrixObserver.disconnect();
         window.matrixObserver = new MutationObserver(() => {

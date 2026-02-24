@@ -1716,55 +1716,49 @@ img {
     width: 100%;
     position: relative;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    /* Show native scrollbar or custom styled one */
-    scrollbar-width: thin;
-    scrollbar-color: var(--gold) #1a1a1a;
+    /* HIDE NATIVE SCROLLBAR - We use the synchronized one */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .tape-chart-wrap::-webkit-scrollbar {
-    height: 10px;
-}
-
-.tape-chart-wrap::-webkit-scrollbar-track {
-    background: #1a1a1a;
-    border-radius: 10px;
-}
-
-.tape-chart-wrap::-webkit-scrollbar-thumb {
-    background: var(--gold);
-    border-radius: 10px;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
 }
 
 /* ── STICKY BOTTOM SCROLLBAR CONTAINER ── */
 .bottom-scrollbar-container {
     position: sticky;
-    bottom: -1px;
+    bottom: 0px;
     left: 0;
     width: 100%;
-    z-index: 100;
-    /* Above matrix content but below potential floats */
-    background: #111118;
+    z-index: 1000;
+    background: #0a0a0f;
     border-top: 1px solid var(--border-light);
-    height: 14px;
+    height: 18px;
+    /* Slightly taller for better touch/click */
     overflow-x: auto;
     overflow-y: hidden;
     display: block;
-    margin-top: -14px;
-    /* Overlay at the very bottom of the wrap if desired, or keep as separate */
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.4);
 }
 
 .bottom-scrollbar-container::-webkit-scrollbar {
-    height: 10px;
+    height: 12px;
 }
 
 .bottom-scrollbar-container::-webkit-scrollbar-track {
-    background: #0f0f15;
+    background: #111118;
 }
 
 .bottom-scrollbar-container::-webkit-scrollbar-thumb {
     background: var(--gold);
     border-radius: 10px;
     cursor: pointer;
+    border: 2px solid #111118;
+    min-width: 150px;
+    /* Ensure a respectable size for the thumb */
 }
 
 
