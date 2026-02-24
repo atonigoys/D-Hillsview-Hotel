@@ -50,8 +50,16 @@
                 <div class="nav-item" data-page="rooms" onclick="switchPage(this, 'rooms')">
                     <span class="nav-icon">🛏️</span> Rooms
                 </div>
-                <div class="nav-item" data-page="rates" onclick="switchPage(this, 'rates')">
-                    <span class="nav-icon">💲</span> Rates & Availability
+                <div class="nav-dropdown" id="ratesDropdown">
+                    <div class="nav-item" onclick="toggleDropdown('ratesDropdown')">
+                        <span class="nav-icon">💲</span> Rates & Availability
+                        <span class="nav-chevron">▾</span>
+                    </div>
+                    <div class="nav-sub-menu">
+                        <div class="nav-sub-item" onclick="switchRatesSubPage('base-rates')">Base Rates</div>
+                        <div class="nav-sub-item" onclick="switchRatesSubPage('rate-plans')">Rate Plans & Packages</div>
+                        <div class="nav-sub-item" onclick="switchRatesSubPage('avail-matrix')">Availability Matrix</div>
+                    </div>
                 </div>
                 <div class="nav-item" data-page="guests" onclick="switchPage(this, 'guests')">
                     <span class="nav-icon">👥</span> Guests

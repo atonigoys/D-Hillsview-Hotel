@@ -111,6 +111,56 @@ function switchPage(el, pageId) {
     if (pageId === 'overview') refreshDashboard();
     if (pageId === 'rooms') renderRoomsGrid();
     if (pageId === 'rates') renderRatesPage();
+
+    // Reset Dropdowns if switching to a non-dropdown page
+    if (pageId !== 'rates') {
+        document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
+    }
+}
+
+// ----------------------------------------------------------
+// SIDEBAR DROPDOWNS
+// ----------------------------------------------------------
+function toggleDropdown(id) {
+    const dropdown = document.getElementById(id);
+    if (!dropdown) return;
+
+    const isOpen = dropdown.classList.contains('open');
+
+    // Close others
+    document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
+
+    if (!isOpen) {
+        dropdown.classList.add('open');
+    }
+}
+
+function switchRatesSubPage(tabId) {
+    // 1. Switch to 'rates' page if not there
+    const ratesTab = document.querySelector('.nav-dropdown#ratesDropdown .nav-item');
+    switchPage(ratesTab, 'rates');
+
+    // 2. Open dropdown
+    const dropdown = document.getElementById('ratesDropdown');
+    if (dropdown) dropdown.classList.add('open');
+
+    // 3. Highlight sub-item
+    document.querySelectorAll('.nav-sub-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.textContent.toLowerCase().includes(tabId.replace('-', ' '))) {
+            item.classList.add('active');
+        }
+        // Specific checks for mixed naming
+        if (tabId === 'base-rates' && item.textContent === 'Base Rates') item.classList.add('active');
+        if (tabId === 'rate-plans' && item.textContent === 'Rate Plans & Packages') item.classList.add('active');
+        if (tabId === 'avail-matrix' && item.textContent === 'Availability Matrix') item.classList.add('active');
+    });
+
+    // 4. Trigger the actual sub-tab render
+    const targetSubTabBtn = document.querySelector(`.rates-tab[onclick*="${tabId}"]`);
+    if (targetSubTabBtn) {
+        switchRatesTab(targetSubTabBtn, tabId);
+    }
 }
 
 // ----------------------------------------------------------
