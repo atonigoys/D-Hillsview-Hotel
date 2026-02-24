@@ -182,6 +182,9 @@ function switchRatesSubPage(tabId) {
     const targetSubTabBtn = document.querySelector(`.rates-tab[onclick*="${tabId}"]`);
     if (targetSubTabBtn) {
         switchRatesTab(targetSubTabBtn, tabId);
+    } else {
+        // Fallback if no tab button found (shouldn't happen with correct tabId)
+        if (tabId === 'avail-matrix') renderAvailMatrix(matrixStartDate);
     }
 }
 
@@ -673,7 +676,7 @@ matrixStartDate.setHours(0, 0, 0, 0);
 function renderRatesPage() {
     renderBaseRates();
     renderRatePlans();
-    renderAvailMatrix(matrixStartDate);
+    // No longer calling renderAvailMatrix here directly, it's handled by sub-tab switching
 }
 
 // Sub-Tab Switching
@@ -925,28 +928,44 @@ const CACHE_TTL = 30000; // 30 seconds cache for infinite scroll expansion
 const roomAssignments = {};
 
 async function renderAvailMatrix(startDate) {
+    console.log('🗓️ Rendering Availability Matrix from:', startDate);
     const chart = document.getElementById('tapeChart');
     const rangeLabel = document.getElementById('matrixDateRange');
-    if (!chart) return;
+    if (!chart) {
+        console.warn('⚠️ #tapeChart not found in DOM.');
+        return;
+    }
 
-    // Fetch bookings and settings (with basic caching for infinite scroll)
     const nowTs = Date.now();
     let bookings, config;
 
-    if (matrixCache.bookings && (nowTs - matrixCache.lastFetch < CACHE_TTL)) {
-        bookings = matrixCache.bookings;
-        config = matrixCache.config;
-    } else {
-        const [bookingsRes, settingsRes] = await Promise.all([
-            window.supabaseClient.from('bookings').select('*'),
-            window.supabaseClient.from('settings').select('*').eq('id', 1).single()
-        ]);
-        bookings = (bookingsRes.data || []).filter(b => b.status !== 'cancelled');
-        config = settingsRes.data || {
-            inventory: { single: 10, deluxe: 10, family: 10 },
-            prices: { single: 180, deluxe: 320, family: 420 }
-        };
-        matrixCache = { bookings, config, lastFetch: nowTs };
+    try {
+        if (matrixCache.bookings && (nowTs - matrixCache.lastFetch < CACHE_TTL)) {
+            console.log('📦 Using cached matrix data');
+            bookings = matrixCache.bookings;
+            config = matrixCache.config;
+        } else {
+            console.log('📡 Fetching fresh matrix data from Supabase...');
+            const [bookingsRes, settingsRes] = await Promise.all([
+                window.supabaseClient.from('bookings').select('*'),
+                window.supabaseClient.from('settings').select('*').eq('id', 1).single()
+            ]);
+
+            if (bookingsRes.error) throw new Error('Bookings fetch failed: ' + bookingsRes.error.message);
+            if (settingsRes.error) throw new Error('Settings fetch failed: ' + settingsRes.error.message);
+
+            bookings = (bookingsRes.data || []).filter(b => b.status !== 'cancelled');
+            config = settingsRes.data || {
+                inventory: { single: 10, deluxe: 10, family: 10 },
+                prices: { single: 180, deluxe: 320, family: 420 }
+            };
+            matrixCache = { bookings, config, lastFetch: nowTs };
+            console.log(`✅ Loaded ${bookings.length} active bookings and config.`);
+        }
+    } catch (err) {
+        console.error('❌ Matrix Data Fetch Error:', err);
+        showToast('Error loading availability matrix: ' + err.message, 'error');
+        return;
     }
 
     const roomStatuses = config.room_statuses || {};
@@ -957,136 +976,155 @@ async function renderAvailMatrix(startDate) {
         { id: 'family', name: 'Family Room', prefix: 3 }
     ];
 
-    // Generate dates
-    const dates = [];
-    for (let i = 0; i < currentTapeDays; i++) {
-        const d = new Date(startDate);
-        d.setDate(d.getDate() + i);
-        dates.push(d);
-    }
-
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-    // Today string (local)
-    const now = new Date();
-    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-
-    // Update label
-    const startLabel = `${monthNames[dates[0].getMonth()]} ${dates[0].getDate()}`;
-    const endLabel = `${monthNames[dates[currentTapeDays - 1].getMonth()]} ${dates[currentTapeDays - 1].getDate()}, ${dates[currentTapeDays - 1].getFullYear()}`;
-    if (rangeLabel) rangeLabel.textContent = `${startLabel} — ${endLabel}`;
-
-    // Helper: format date to YYYY-MM-DD (local)
-    function fmtDate(d) {
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    }
-
-    // Columns: 1 label + currentTapeDays dates
-    chart.style.gridTemplateColumns = `140px repeat(${currentTapeDays}, 70px)`;
-
-    let html = '';
-
-    // ── DATE HEADER ROW ──
-    html += `<div class="tc-date-row">`;
-    html += `<div class="tc-corner"></div>`;
-    dates.forEach(d => {
-        const ds = fmtDate(d);
-        const isToday = ds === todayStr;
-        html += `<div class="tc-date-cell${isToday ? ' tc-today' : ''}">
-            <span class="tc-day-name">${dayNames[d.getDay()]}</span>
-            <span class="tc-day-num">${d.getDate()} ${monthNames[d.getMonth()]}</span>
-        </div>`;
-    });
-    html += `</div>`;
-
-    // For each room type
-    roomTypes.forEach(rt => {
-        const inv = config.inventory[rt.id] || 10;
-        const price = config.prices[rt.id] || 0;
-
-        // ── GROUP HEADER ──
-        html += `<div class="tc-group-row">`;
-        html += `<div class="tc-group-label">▸ ${rt.name} <span class="tc-group-price">₱${price.toLocaleString()} / night</span></div>`;
-        dates.forEach(d => {
-            const isToday = fmtDate(d) === todayStr;
-            html += `<div class="tc-group-day${isToday ? ' tc-today' : ''}"></div>`;
-        });
-        html += `</div>`;
-
-        // Get bookings for this room type
-        const typeBookings = bookings.filter(b => b.room.toLowerCase().includes(rt.id));
-
-        // Smart room assignment: respect manual assignments, then fill gaps
-        function getSlotForBooking(booking, slotNum) {
-            // If manually assigned, use that
-            if (roomAssignments[booking.id] !== undefined) {
-                return roomAssignments[booking.id] === slotNum;
-            }
-            // Default round-robin
-            const idx = typeBookings.indexOf(booking);
-            return (idx % inv) === (slotNum - 1);
+    try {
+        console.log('🏗️ Generating Matrix HTML...');
+        // Generate dates
+        const dates = [];
+        for (let i = 0; i < currentTapeDays; i++) {
+            const d = new Date(startDate);
+            d.setDate(d.getDate() + i);
+            dates.push(d);
         }
 
-        // ── INDIVIDUAL ROOM ROWS ──
-        for (let r = 1; r <= inv; r++) {
-            const roomNum = rt.prefix * 100 + r;
-            const rStatus = roomStatuses[roomNum] || 'clean';
-            const statusIcon = rStatus === 'maintenance' ? '🔴' : rStatus === 'dirty' ? '🟡' : '🟢';
-            const statusTitle = rStatus === 'maintenance' ? 'Maintenance' : rStatus === 'dirty' ? 'Dirty' : 'Clean';
-            html += `<div class="tc-room-row${rStatus === 'maintenance' ? ' tc-maintenance' : ''}">`;
-            html += `<div class="tc-room-label"><span class="tc-room-status" data-room="${roomNum}" title="${statusTitle} — Click to change">${statusIcon}</span> Room ${roomNum}</div>`;
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-            const roomSlotBookings = typeBookings.filter(b => getSlotForBooking(b, r));
+        // Today string (local)
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-            dates.forEach((d, colIdx) => {
-                const ds = fmtDate(d);
-                const isToday = ds === todayStr;
-                html += `<div class="tc-room-cell${isToday ? ' tc-today' : ''}" data-room="${roomNum}" data-room-type="${rt.id}" data-slot="${r}" data-date="${ds}">`;
+        // Update label
+        const startLabel = `${monthNames[dates[0].getMonth()]} ${dates[0].getDate()}`;
+        const endLabel = `${monthNames[dates[currentTapeDays - 1].getMonth()]} ${dates[currentTapeDays - 1].getDate()}, ${dates[currentTapeDays - 1].getFullYear()}`;
+        if (rangeLabel) rangeLabel.textContent = `${startLabel} — ${endLabel}`;
 
-                roomSlotBookings.forEach(b => {
-                    if (b.checkin <= ds && b.checkout > ds) {
-                        const barStart = b.checkin < fmtDate(dates[0]) ? fmtDate(dates[0]) : b.checkin;
-                        if (ds === barStart) {
-                            const endDate = b.checkout > fmtDate(dates[TAPE_DAYS - 1]) ? fmtDate(dates[TAPE_DAYS - 1]) : b.checkout;
-                            const startD = new Date(barStart + 'T00:00:00');
-                            const endD = new Date(endDate + 'T00:00:00');
-                            const spanDays = Math.max(1, Math.round((endD - startD) / 86400000));
-
-                            const widthPx = spanDays * 70 - 2;
-
-                            const statusClass = b.status === 'confirmed' ? 'status-confirmed'
-                                : b.status === 'pending' ? 'status-pending'
-                                    : b.status === 'checked-in' ? 'status-checked-in'
-                                        : 'status-cancelled';
-
-                            const guestName = b.guest || b.email?.split('@')[0] || 'Guest';
-                            html += `<div class="tc-booking-bar ${statusClass}" draggable="true" data-booking-id="${b.id}" data-room-type="${rt.id}" style="width:${widthPx}px;" title="${guestName} — ${b.checkin} to ${b.checkout} (${b.status})">${guestName}</div>`;
-                        }
-                    }
-                });
-
-                html += `</div>`;
-            });
-
-            html += `</div>`;
+        // Helper: format date to YYYY-MM-DD (local)
+        function fmtDate(d) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         }
 
-        // ── OCCUPANCY ROW ──
-        html += `<div class="tc-occ-row">`;
-        html += `<div class="tc-occ-label">Occupancy</div>`;
+        // Columns: 1 label + currentTapeDays dates
+        chart.style.gridTemplateColumns = `140px repeat(${currentTapeDays}, 70px)`;
+
+        let html = '';
+
+        // ── DATE HEADER ROW ──
+        html += `<div class="tc-date-row">`;
+        html += `<div class="tc-corner"></div>`;
         dates.forEach(d => {
             const ds = fmtDate(d);
             const isToday = ds === todayStr;
-            const bookedCount = typeBookings.filter(b => b.checkin <= ds && b.checkout > ds).length;
-            const pct = inv > 0 ? Math.round((bookedCount / inv) * 100) : 0;
-            const occClass = pct >= 80 ? 'occ-high' : pct >= 40 ? 'occ-med' : 'occ-low';
-            html += `<div class="tc-occ-cell${isToday ? ' tc-today' : ''} ${occClass}">${pct}%</div>`;
+            html += `<div class="tc-date-cell${isToday ? ' tc-today' : ''}">
+            <span class="tc-day-name">${dayNames[d.getDay()]}</span>
+            <span class="tc-day-num">${d.getDate()} ${monthNames[d.getMonth()]}</span>
+        </div>`;
         });
         html += `</div>`;
-    });
 
-    chart.innerHTML = html;
+        // For each room type
+        roomTypes.forEach(rt => {
+            const inv = config.inventory[rt.id] || 10;
+            const price = config.prices[rt.id] || 0;
+
+            // ── GROUP HEADER ──
+            html += `<div class="tc-group-row">`;
+            html += `<div class="tc-group-label">▸ ${rt.name} <span class="tc-group-price">₱${price.toLocaleString()} / night</span></div>`;
+            dates.forEach(d => {
+                const isToday = fmtDate(d) === todayStr;
+                html += `<div class="tc-group-day${isToday ? ' tc-today' : ''}"></div>`;
+            });
+            html += `</div>`;
+
+            // Get bookings for this room type
+            const typeBookings = bookings.filter(b => b.room.toLowerCase().includes(rt.id));
+
+            // Smart room assignment: respect manual assignments, then fill gaps
+            function getSlotForBooking(booking, slotNum) {
+                // If manually assigned, use that
+                if (roomAssignments[booking.id] !== undefined) {
+                    return roomAssignments[booking.id] === slotNum;
+                }
+                // Default round-robin
+                const idx = typeBookings.indexOf(booking);
+                return (idx % inv) === (slotNum - 1);
+            }
+
+            // ── INDIVIDUAL ROOM ROWS ──
+            for (let r = 1; r <= inv; r++) {
+                const roomNum = rt.prefix * 100 + r;
+                const rStatus = roomStatuses[roomNum] || 'clean';
+                const statusIcon = rStatus === 'maintenance' ? '🔴' : rStatus === 'dirty' ? '🟡' : '🟢';
+                const statusTitle = rStatus === 'maintenance' ? 'Maintenance' : rStatus === 'dirty' ? 'Dirty' : 'Clean';
+                html += `<div class="tc-room-row${rStatus === 'maintenance' ? ' tc-maintenance' : ''}">`;
+                html += `<div class="tc-room-label"><span class="tc-room-status" data-room="${roomNum}" title="${statusTitle} — Click to change">${statusIcon}</span> Room ${roomNum}</div>`;
+
+                const roomSlotBookings = typeBookings.filter(b => getSlotForBooking(b, r));
+
+                dates.forEach((d, colIdx) => {
+                    const ds = fmtDate(d);
+                    const isToday = ds === todayStr;
+                    html += `<div class="tc-room-cell${isToday ? ' tc-today' : ''}" data-room="${roomNum}" data-room-type="${rt.id}" data-slot="${r}" data-date="${ds}">`;
+
+                    roomSlotBookings.forEach(b => {
+                        if (!b.checkin || !b.checkout) return; // Skip broken bookings
+                        if (b.checkin <= ds && b.checkout > ds) {
+                            const barStart = b.checkin < fmtDate(dates[0]) ? fmtDate(dates[0]) : b.checkin;
+                            if (ds === barStart) {
+                                const endDate = b.checkout > fmtDate(dates[currentTapeDays - 1]) ? fmtDate(dates[currentTapeDays - 1]) : b.checkout;
+
+                                const startD = new Date(barStart + 'T00:00:00');
+                                const endD = new Date(endDate + 'T00:00:00');
+
+                                if (isNaN(startD.getTime()) || isNaN(endD.getTime())) {
+                                    console.warn('⚠️ Invalid dates for booking:', b.ref, barStart, endDate);
+                                    return;
+                                }
+
+                                const spanDays = Math.max(1, Math.round((endD - startD) / 86400000));
+
+                                const widthPx = spanDays * 70 - 2;
+
+                                const statusClass = b.status === 'confirmed' ? 'status-confirmed'
+                                    : b.status === 'pending' ? 'status-pending'
+                                        : b.status === 'checked-in' ? 'status-checked-in'
+                                            : 'status-cancelled';
+
+                                const guestName = b.guest || b.email?.split('@')[0] || 'Guest';
+                                html += `<div class="tc-booking-bar ${statusClass}" draggable="true" data-booking-id="${b.id}" data-room-type="${rt.id}" style="width:${widthPx}px;" title="${guestName} — ${b.checkin} to ${b.checkout} (${b.status})">${guestName}</div>`;
+                            }
+                        }
+                    });
+
+                    html += `</div>`;
+                });
+
+                html += `</div>`;
+            }
+
+            // ── OCCUPANCY ROW ──
+            html += `<div class="tc-occ-row">`;
+            html += `<div class="tc-occ-label">Occupancy</div>`;
+            dates.forEach(d => {
+                const ds = fmtDate(d);
+                const isToday = ds === todayStr;
+                const bookedCount = typeBookings.filter(b => b.checkin <= ds && b.checkout > ds).length;
+                const pct = inv > 0 ? Math.round((bookedCount / inv) * 100) : 0;
+                const occClass = pct >= 80 ? 'occ-high' : pct >= 40 ? 'occ-med' : 'occ-low';
+                html += `<div class="tc-occ-cell${isToday ? ' tc-today' : ''} ${occClass}">${pct}%</div>`;
+            });
+            html += `</div>`;
+        });
+
+        chart.innerHTML = html;
+        console.log('✨ Matrix HTML rendered to DOM.');
+    } catch (renderErr) {
+        console.error('❌ Matrix Render Loop Error:', renderErr);
+        showToast('Rendering error: ' + renderErr.message, 'error');
+        chart.innerHTML = `<div style="padding:2rem; color:var(--red); text-align:center;">
+            ⚠️ Error building matrix: ${renderErr.message}<br>
+            Check console for details.
+        </div>`;
+    }
 
     // ── ATTACH DRAG-AND-DROP LISTENERS ──
     attachTapeChartDragDrop(chart, bookings);
