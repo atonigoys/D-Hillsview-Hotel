@@ -1566,39 +1566,45 @@ img {
 }
 
 .tape-chart-wrap {
-    overflow-x: auto;
+    overflow-x: scroll;
+    /* Force scrollbar gutter */
+    overflow-y: auto;
+    /* Scroll rooms vertically */
+    max-height: 75vh;
+    /* Keep horizontal scrollbar in view */
     border-radius: var(--radius);
     border: 1px solid var(--border-light);
     background: var(--bg-card);
+    padding-bottom: 10px;
 
-    /* Permanent Scrollbar Styling */
-    scrollbar-width: thin;
-    scrollbar-color: var(--gold) transparent;
+    /* IE/Firefox Support */
+    scrollbar-width: auto;
+    scrollbar-color: var(--gold) rgba(255, 255, 255, 0.05);
 }
 
-/* Chrome, Edge, Safari */
+/* Custom Scrollbar for Chrome, Edge, Safari */
 .tape-chart-wrap::-webkit-scrollbar {
-    height: 8px;
-    /* Height for horizontal scrollbar */
+    height: 14px;
+    /* Much taller for visibility */
+    width: 8px;
+    /* Vertical scrollbar width */
     display: block;
-    /* Ensure it stays visible */
 }
 
 .tape-chart-wrap::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
 }
 
 .tape-chart-wrap::-webkit-scrollbar-thumb {
     background: var(--gold);
     border-radius: 10px;
-    border: 2px solid var(--bg-card);
-    /* Add padding effect */
+    border: 3px solid var(--bg-card);
+    /* Floating effect */
 }
 
 .tape-chart-wrap::-webkit-scrollbar-thumb:hover {
     background: #e5c07b;
-    /* Lighter gold on hover */
 }
 
 /* New Matrix Sidebar Layout */
