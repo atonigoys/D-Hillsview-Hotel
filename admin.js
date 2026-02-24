@@ -978,15 +978,11 @@ async function renderAvailMatrix(startDate) {
             defaultDate: matrixStartDate,
             monthSelectorType: "static",
             yearSelectorType: "static",
-            disableMobile: "true", // Force custom picker on mobile too
+            disableMobile: "true",
             position: "auto",
-            static: true, // Appends it directly after the element in DOM
-            onOpen: () => {
-                rangeLabel.classList.add('active');
-            },
-            onClose: () => {
-                rangeLabel.classList.remove('active');
-            },
+            // Removed static: true to allow it to pop over properly
+            onOpen: () => rangeLabel.classList.add('active'),
+            onClose: () => rangeLabel.classList.remove('active'),
             onChange: (selectedDates) => {
                 if (selectedDates.length) {
                     renderAvailMatrix(selectedDates[0]);

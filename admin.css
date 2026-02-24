@@ -1605,6 +1605,35 @@ img {
     padding: 1rem 1.25rem;
     border-radius: 12px;
     border: 1px solid #e0e6ed;
+    color: #1e293b;
+    /* Dark text for light background */
+}
+
+.tape-header h2 {
+    color: #0f172a;
+    margin: 0;
+}
+
+.tape-header p {
+    color: #64748b;
+    margin-top: 4px;
+}
+
+.tape-header .topbar-btn {
+    background: #f1f5f9;
+    color: #1e293b;
+    border-color: #cbd5e1;
+}
+
+.tape-header .topbar-btn:hover {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+}
+
+.tape-header .topbar-btn.primary {
+    background: #3b82f6;
+    color: white;
+    border-color: #2563eb;
 }
 
 .avail-nav {
